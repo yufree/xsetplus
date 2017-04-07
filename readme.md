@@ -1,0 +1,25 @@
+Use the following code to install dependance for this package
+
+```
+install.packages('devtools')
+install.packages("WGCNA")
+source("https://bioconductor.org/biocLite.R")
+biocLite()
+biocLite("Rdisop",suppressUpdates=TRUE)
+biocLite("SSOAP",suppressUpdates=TRUE)
+biocLite("KEGGREST",suppressUpdates=TRUE)
+biocLite("pcaMethods")
+biocLite('GO.db')
+biocLite('impute')
+biocLite('preprocessCore')
+biocLite('bitops')
+biocLite('xcms')
+biocLite('RBGL')
+biocLite('igraph')
+biocLite('annotate')
+devtools::install_github('yufree/MAIT')
+devtools::install_github('yufree/xMSannotator')
+devtools::install_github('yufree/sva-devel')
+devtools::install_github('yufree/xsetplus')
+library('xsetplus')
+```

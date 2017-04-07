@@ -1,3 +1,4 @@
+#' @export
 getopqedata <- function(path,
                         index = F,
                         xsmethod = "centWave",

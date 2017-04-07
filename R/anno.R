@@ -88,6 +88,7 @@ fanno <-
                          "M+H-2H2O"
                  ),
                  db_name = 'HMDB') {
+                data <- xcms::groupval(xset, 'medret', "into")
                 adduct_weights = cbind.data.frame(Adduct = c('M+H','M-H'),Weight = c(5,5))
                 mz <- xcms::groups(xset)[, 1]
                 time <- xcms::groups(xset)[, 4]

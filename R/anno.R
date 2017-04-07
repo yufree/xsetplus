@@ -83,6 +83,7 @@ fanno <-
                  ),
                  db_name = 'HMDB') {
                 adduct_weights = cbind.data.frame(Adduct = c('M+H','M-H'),Weight = c(5,5))
+                data("adduct_table")
                 data <- xcms::groupval(xset, 'medret', "into")
                 mz <- xcms::groups(xset)[, 1]
                 time <- xcms::groups(xset)[, 4]
@@ -258,6 +259,7 @@ svafanno <- function(raw,
                      ),
                      db_name = 'HMDB') {
         adduct_weights = cbind.data.frame(Adduct = c('M+H','M-H'),Weight = c(5,5))
+        data("adduct_table")
         if (is.null(raw$dataCorrected)) {
                 data <- raw$data
         }

@@ -42,7 +42,6 @@ anno <- function(path, name, mode = NULL) {
                         polarity = modename
                 )
         metTable <- MAIT::metaboliteTable(MAIT)
-        head(metTable)
         return(list(signTable, metTable))
 }
 
@@ -83,14 +82,14 @@ fanno <-
                          "M+H-2H2O"
                  ),
                  db_name = 'HMDB') {
-                data(adduct_weights)
+                adduct_weights = cbind.data.frame(Adduct = c('M+H','M-H'),Weight = c(5,5))
                 data <- xcms::groupval(xset, 'medret', "into")
                 mz <- xcms::groups(xset)[, 1]
                 time <- xcms::groups(xset)[, 4]
                 data <- as.data.frame(cbind(mz, time, data))
                 data <- unique(data)
                 annotres <-
-                        multilevelannotation(
+                        xMSannotator::multilevelannotation(
                                 dataA = data,
                                 max.mz.diff = 5,
                                 max.rt.diff = 10,
@@ -258,7 +257,7 @@ svafanno <- function(raw,
                              "M+H-2H2O"
                      ),
                      db_name = 'HMDB') {
-        data(adduct_weights)
+        adduct_weights = cbind.data.frame(Adduct = c('M+H','M-H'),Weight = c(5,5))
         if (is.null(raw$dataCorrected)) {
                 data <- raw$data
         }

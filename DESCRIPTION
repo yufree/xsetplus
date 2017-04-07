@@ -1,7 +1,7 @@
 Package: xsetplus
 Type: Package
 Title: process and annotate data with xcms in simple way
-Version: 0.1.0
+Version: 0.1.1
 Author: Miao Yu
 Maintainer: Miao Yu <yufreecas@gmail.com>
 Description: More about what it does (maybe more than one line)
@@ -13,5 +13,5 @@ Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr
 biocViews:
-Imports: xcms,BiocParallel, MAIT, xMSannotator, limma, sva, CAMERA, qvalue, RColorBrewer
+Imports: grDevices, graphics, stats, utils, xcms,BiocParallel, MAIT, xMSannotator, limma, sva, CAMERA, qvalue, RColorBrewer
 RoxygenNote: 6.0.1

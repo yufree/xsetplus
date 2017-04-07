@@ -201,7 +201,7 @@ getupload <-
                 data <-
                         rbind(group = as.character(xcms::phenoData(xset)$class), peakIntensities)
                 filename <- paste0(name, '.csv')
-                write.csv(data, file = filename)
+                utils::write.csv(data, file = filename)
                 return(data)
         }
 #' Get the report for technique replicates.
@@ -215,8 +215,8 @@ gettechrep <- function(xset,
                        intensity = 'into') {
         data <- t(xcms::groupval(xset, method, intensity))
         lv <- xset@phenoData[, 1]
-        mean <- aggregate(data, list(lv), mean)
-        sd <- aggregate(data, list(lv), sd)
+        mean <- stats::aggregate(data, list(lv), mean)
+        sd <- stats::aggregate(data, list(lv), sd)
         suppressWarnings(rsd <- sd / mean * 100)
         result <-
                 data.frame(cbind(t(mean[, -1]), t(sd[, -1]), t(rsd[, -1])))
@@ -248,8 +248,8 @@ gettechbiorep <-
                 data <- t(xcms::groupval(xset, method, intensity))
                 lv <- xset@phenoData[, 1]
                 lv2 <- xset@phenoData[, 2]
-                mean <- aggregate(data, list(lv, lv2), mean)
-                sd <- aggregate(data, list(lv, lv2), sd)
+                mean <- stats::aggregate(data, list(lv, lv2), mean)
+                sd <- stats::aggregate(data, list(lv, lv2), sd)
                 suppressWarnings(rsd <- sd / mean * 100)
                 result <-
                         data.frame(cbind(t(mean[, -c(1:2)]), t(sd[, -c(1:2)]), t(rsd[, -c(1:2)])))
@@ -270,7 +270,7 @@ gettechbiorep <-
                 } else if (peaklist) {
                         result <- data.frame(t(mean[, -c(1:2)]))
                         data <- rbind(group = name, result)
-                        write.csv(data, file = file)
+                        utils::write.csv(data, file = file)
                 } else{
                         return(report)
                 }

@@ -26,11 +26,11 @@ svacor <-
                 }
                 mz <- xset@groups[, 1]
                 rt <- xset@groups[, 4]
-                mod <- model.matrix(~ lv)
+                mod <- stats::model.matrix(~ lv)
                 mod0 <- as.matrix(c(rep(1, ncol(data))))
                 svafit <- sva::sva(data, mod)
                 if (svafit$n.sv == 0) {
-                        svaX <- model.matrix(~ lv)
+                        svaX <- stats::model.matrix(~ lv)
                         lmfit <- limma::lmFit(data, svaX)
                         signal <-
                                 lmfit$coef[, 1:nlevels(lv)] %*% t(svaX[, 1:nlevels(lv)])
@@ -94,7 +94,7 @@ svacor <-
                 }
                 else{
                         message('Data is correcting ...')
-                        svaX <- model.matrix(~ lv + svafit$sv)
+                        svaX <- stats::model.matrix(~ lv + svafit$sv)
                         lmfit <- limma::lmFit(data, svaX)
                         batch <-
                                 lmfit$coef[, (nlevels(lv) + 1):(nlevels(lv) + svafit$n.sv)] %*% t(svaX[, (nlevels(lv) +
@@ -103,7 +103,7 @@ svacor <-
                                 lmfit$coef[, 1:nlevels(lv)] %*% t(svaX[, 1:nlevels(lv)])
                         error <- data - signal - batch
                         datacor <- signal + error
-                        svaX2 <- model.matrix(~ lv)
+                        svaX2 <- stats::model.matrix(~ lv)
                         lmfit2 <- limma::lmFit(data, svaX2)
                         signal2 <-
                                 lmfit2$coef[, 1:nlevels(lv)] %*% t(svaX2[, 1:nlevels(lv)])
@@ -243,34 +243,34 @@ svapca <- function(list,
                 pch = lv
         }
 
-        par(mfrow = c(2, 5), mar = c(4, 4, 2.6, 1))
+        graphics::par(mfrow = c(2, 5), mar = c(4, 4, 2.6, 1))
 
-        pcao <- prcomp(t(data), center = center, scale = scale)
+        pcao <- stats::prcomp(t(data), center = center, scale = scale)
         pcaoVars = signif(((pcao$sdev) ^ 2) / (sum((pcao$sdev) ^ 2)), 3) *
                 100
-        plot(pcao, type = "l", main = "PCA")
+        graphics::plot(pcao, type = "l", main = "PCA")
 
-        pca <- prcomp(t(Signal), center = TRUE, scale = TRUE)
+        pca <- stats::prcomp(t(Signal), center = TRUE, scale = TRUE)
         pcaVars = signif(((pca$sdev) ^ 2) / (sum((pca$sdev) ^ 2)), 3) *
                 100
-        plot(pca, type = "l", main = "PCA-signal")
+        graphics::plot(pca, type = "l", main = "PCA-signal")
 
-        pcab <- prcomp(t(Batch), center = center, scale = scale)
+        pcab <- stats::prcomp(t(Batch), center = center, scale = scale)
         pcabVars = signif(((pcab$sdev) ^ 2) / (sum((pcab$sdev) ^ 2)), 3) *
                 100
-        plot(pcab, type = "l", main = "PCA-batch")
+        graphics::plot(pcab, type = "l", main = "PCA-batch")
 
-        pcae <- prcomp(t(datacor), center = center, scale = scale)
+        pcae <- stats::prcomp(t(error), center = center, scale = scale)
         pcaeVars = signif(((pcae$sdev) ^ 2) / (sum((pcae$sdev) ^ 2)), 3) *
                 100
-        plot(pcae, type = "l", main = "PCA-error")
+        graphics::plot(pcae, type = "l", main = "PCA-error")
 
-        pcac <- prcomp(t(datacor), center = center, scale = scale)
+        pcac <- stats::prcomp(t(datacor), center = center, scale = scale)
         pcacVars = signif(((pcac$sdev) ^ 2) / (sum((pcac$sdev) ^ 2)), 3) *
                 100
-        plot(pcac, type = "l", main = "PCA-corrected")
+        graphics::plot(pcac, type = "l", main = "PCA-corrected")
 
-        plot(
+        graphics::plot(
                 pcao$x[, 1],
                 pcao$x[, 2],
                 xlab = paste("PC1:", pcaoVars[1], "% of Variance Explained"),
@@ -280,7 +280,7 @@ svapca <- function(list,
                 main = "PCA"
         )
 
-        plot(
+        graphics::plot(
                 pca$x[, 1],
                 pca$x[, 2],
                 xlab = paste("PC1:", pcaVars[1], "% of Variance Explained"),
@@ -290,7 +290,7 @@ svapca <- function(list,
                 main = "PCA-signal"
         )
 
-        plot(
+        graphics::plot(
                 pcab$x[, 1],
                 pcab$x[, 2],
                 xlab = paste("PC1:", pcabVars[1], "% of Variance Explained"),
@@ -300,7 +300,7 @@ svapca <- function(list,
                 main = "PCA-batch"
         )
 
-        plot(
+        graphics::plot(
                 pcae$x[, 1],
                 pcae$x[, 2],
                 xlab = paste("PC1:", pcaeVars[1], "% of Variance Explained"),
@@ -310,7 +310,7 @@ svapca <- function(list,
                 main = "PCA-error"
         )
 
-        plot(
+        graphics::plot(
                 pcac$x[, 1],
                 pcac$x[, 2],
                 xlab = paste("PC1:", pcacVars[1], "% of Variance Explained"),
@@ -433,15 +433,15 @@ svaplot <- function(list,
         qValuesSv <- list$'q-valuesCorrected'
 
         icolors <-
-                colorRampPalette(rev(RColorBrewer::brewer.pal(11, "RdYlBu")))(100)
+                grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(11, "RdYlBu")))(100)
 
         if (is.null(signal2)) {
                 if (pqvalues == "anova" & sum(pValues < pt & qValues < qt) != 0) {
                         message('No SV while p-values and q-values have results')
-                        layout(matrix(rep(
+                        graphics::layout(matrix(rep(
                                 c(1, 1, 2, 2, 3, 3, 4, 4, 5), 9
                         ), 9, 9, byrow = TRUE))
-                        par(mar = c(3, 5, 1, 1))
+                        graphics::par(mar = c(3, 5, 1, 1))
                         data <- data[pValues < pt & qValues < qt,]
                         signal <-
                                 signal[pValues < pt &
@@ -450,7 +450,7 @@ svaplot <- function(list,
                                 error[pValues < pt & qValues < qt,]
                         zlim <- range(c(data, signal, error))
 
-                        image(
+                        graphics::image(
                                 t(data),
                                 col = icolors,
                                 xlab = 'samples',
@@ -459,7 +459,7 @@ svaplot <- function(list,
                                 yaxt = "n",
                                 zlim = zlim
                         )
-                        axis(
+                        graphics::axis(
                                 1,
                                 at = seq(0, 1, 1 / (ncol(
                                         data
@@ -468,7 +468,7 @@ svaplot <- function(list,
                                 cex.axis = 0.618,
                                 las = 2
                         )
-                        axis(
+                        graphics::axis(
                                 2,
                                 at = seq(0, 1, 1 / (nrow(
                                         data
@@ -478,7 +478,7 @@ svaplot <- function(list,
                                 las = 2
                         )
 
-                        image(
+                        graphics::image(
                                 t(signal),
                                 col = icolors,
                                 xlab = 'samples',
@@ -487,7 +487,7 @@ svaplot <- function(list,
                                 yaxt = "n",
                                 zlim = zlim
                         )
-                        axis(
+                        graphics::axis(
                                 1,
                                 at = seq(0, 1, 1 / (ncol(
                                         signal
@@ -496,7 +496,7 @@ svaplot <- function(list,
                                 cex.axis = 0.618,
                                 las = 2
                         )
-                        axis(
+                        graphics::axis(
                                 2,
                                 at = seq(0, 1, 1 / (nrow(
                                         signal
@@ -506,7 +506,7 @@ svaplot <- function(list,
                                 las = 2
                         )
 
-                        image(
+                        graphics::image(
                                 t(error),
                                 col = icolors,
                                 xlab = 'samples',
@@ -515,7 +515,7 @@ svaplot <- function(list,
                                 yaxt = "n",
                                 zlim = zlim
                         )
-                        axis(
+                        graphics::axis(
                                 1,
                                 at = seq(0, 1, 1 / (ncol(
                                         error
@@ -524,7 +524,7 @@ svaplot <- function(list,
                                 cex.axis = 0.618,
                                 las = 2
                         )
-                        axis(
+                        graphics::axis(
                                 2,
                                 at = seq(0, 1, 1 / (nrow(
                                         error
@@ -538,7 +538,7 @@ svaplot <- function(list,
                                 seq(zlim[1], zlim[2], round((zlim[2] - zlim[1]) / 10))
                         poly <-
                                 vector(mode = "list", length(icolors))
-                        plot(
+                        graphics::plot(
                                 1,
                                 1,
                                 t = "n",
@@ -552,7 +552,7 @@ svaplot <- function(list,
                                 xlab = 'intensity',
                                 frame.plot = F
                         )
-                        axis(
+                        graphics::axis(
                                 4,
                                 at = breaks,
                                 labels = round(breaks),
@@ -562,7 +562,7 @@ svaplot <- function(list,
                         bks <-
                                 seq(zlim[1], zlim[2], length.out = (length(icolors) + 1))
                         for (i in seq(poly)) {
-                                polygon(
+                                graphics::polygon(
                                         c(0.1, 0.1, 0.3, 0.3),
                                         c(bks[i], bks[i + 1], bks[i + 1], bks[i]),
                                         col = icolors[i],
@@ -577,13 +577,13 @@ svaplot <- function(list,
                 }
                 else{
                         message('No SV while p-values and q-values have no results')
-                        layout(matrix(rep(
+                        graphics::layout(matrix(rep(
                                 c(1, 1, 1, 2, 2, 3, 3, 4), 8
                         ), 8, 8, byrow = TRUE))
-                        par(mar = c(3, 6, 2, 3))
+                        graphics::par(mar = c(3, 6, 2, 3))
                         zlim <- range(c(data, signal, error))
 
-                        image(
+                        graphics::image(
                                 t(data),
                                 col = icolors,
                                 xlab = 'samples',
@@ -592,7 +592,7 @@ svaplot <- function(list,
                                 yaxt = "n",
                                 zlim = zlim
                         )
-                        axis(
+                        graphics::axis(
                                 1,
                                 at = seq(0, 1, 1 / (ncol(
                                         data
@@ -601,7 +601,7 @@ svaplot <- function(list,
                                 cex.axis = 0.618,
                                 las = 2
                         )
-                        axis(
+                        graphics::axis(
                                 2,
                                 at = seq(0, 1, 1 / (nrow(
                                         data
@@ -610,8 +610,8 @@ svaplot <- function(list,
                                 cex.axis = 0.618,
                                 las = 2
                         )
-                        par(mar = c(3, 3, 2, 1))
-                        image(
+                        graphics::par(mar = c(3, 3, 2, 1))
+                        graphics::image(
                                 t(signal),
                                 col = icolors,
                                 xlab = 'samples',
@@ -620,7 +620,7 @@ svaplot <- function(list,
                                 yaxt = "n",
                                 zlim = zlim
                         )
-                        axis(
+                        graphics::axis(
                                 1,
                                 at = seq(0, 1, 1 / (ncol(
                                         signal
@@ -629,8 +629,8 @@ svaplot <- function(list,
                                 cex.axis = 0.618,
                                 las = 2
                         )
-                        par(mar = c(3, 3, 2, 1))
-                        image(
+                        graphics::par(mar = c(3, 3, 2, 1))
+                        graphics::image(
                                 t(error),
                                 col = icolors,
                                 xlab = 'samples',
@@ -639,7 +639,7 @@ svaplot <- function(list,
                                 yaxt = "n",
                                 zlim = zlim
                         )
-                        axis(
+                        graphics::axis(
                                 1,
                                 at = seq(0, 1, 1 / (ncol(
                                         error
@@ -653,8 +653,8 @@ svaplot <- function(list,
                                 seq(zlim[1], zlim[2], round((zlim[2] - zlim[1]) / 10))
                         poly <-
                                 vector(mode = "list", length(icolors))
-                        par(mar = c(3, 0, 2, 3))
-                        plot(
+                        graphics::par(mar = c(3, 0, 2, 3))
+                        graphics::plot(
                                 1,
                                 1,
                                 t = "n",
@@ -668,7 +668,7 @@ svaplot <- function(list,
                                 xlab = 'intensity',
                                 frame.plot = F
                         )
-                        axis(
+                        graphics::axis(
                                 4,
                                 at = breaks,
                                 labels = round(breaks),
@@ -678,7 +678,7 @@ svaplot <- function(list,
                         bks <-
                                 seq(zlim[1], zlim[2], length.out = (length(icolors) + 1))
                         for (i in seq(poly)) {
-                                polygon(
+                                graphics::polygon(
                                         c(0.1, 0.1, 0.3, 0.3),
                                         c(bks[i], bks[i + 1], bks[i + 1], bks[i]),
                                         col = icolors[i],
@@ -689,10 +689,10 @@ svaplot <- function(list,
         } else{
                 if (pqvalues == "anova" & sum(pValues < pt & qValues < qt) != 0) {
                         message('Have SVs while p-values and q-values have results')
-                        layout(matrix(rep(
+                        graphics::layout(matrix(rep(
                                 c(1, 1, 2, 2, 3, 3, 4, 4, 5), 9
                         ), 9, 9, byrow = TRUE))
-                        par(mar = c(3, 5, 1, 1))
+                        graphics::par(mar = c(3, 5, 1, 1))
                         data <- data[pValues < pt & qValues < qt,]
                         signal <-
                                 signal2[pValues < pt &
@@ -702,7 +702,7 @@ svaplot <- function(list,
                                                qValues < qt,]
                         zlim <- range(c(data, signal, error))
 
-                        image(
+                        graphics::image(
                                 t(data),
                                 col = icolors,
                                 xlab = 'samples',
@@ -711,7 +711,7 @@ svaplot <- function(list,
                                 yaxt = "n",
                                 zlim = zlim
                         )
-                        axis(
+                        graphics::axis(
                                 1,
                                 at = seq(0, 1, 1 / (ncol(
                                         data
@@ -720,7 +720,7 @@ svaplot <- function(list,
                                 cex.axis = 0.618,
                                 las = 2
                         )
-                        axis(
+                        graphics::axis(
                                 2,
                                 at = seq(0, 1, 1 / (nrow(
                                         data
@@ -730,7 +730,7 @@ svaplot <- function(list,
                                 las = 2
                         )
 
-                        image(
+                        graphics::image(
                                 t(signal),
                                 col = icolors,
                                 xlab = 'samples',
@@ -739,7 +739,7 @@ svaplot <- function(list,
                                 yaxt = "n",
                                 zlim = zlim
                         )
-                        axis(
+                        graphics::axis(
                                 1,
                                 at = seq(0, 1, 1 / (ncol(
                                         signal
@@ -748,7 +748,7 @@ svaplot <- function(list,
                                 cex.axis = 0.618,
                                 las = 2
                         )
-                        axis(
+                        graphics::axis(
                                 2,
                                 at = seq(0, 1, 1 / (nrow(
                                         signal
@@ -758,7 +758,7 @@ svaplot <- function(list,
                                 las = 2
                         )
 
-                        image(
+                        graphics::image(
                                 t(error),
                                 col = icolors,
                                 xlab = 'samples',
@@ -767,7 +767,7 @@ svaplot <- function(list,
                                 yaxt = "n",
                                 zlim = zlim
                         )
-                        axis(
+                        graphics::axis(
                                 1,
                                 at = seq(0, 1, 1 / (ncol(
                                         error
@@ -776,7 +776,7 @@ svaplot <- function(list,
                                 cex.axis = 0.618,
                                 las = 2
                         )
-                        axis(
+                        graphics::axis(
                                 2,
                                 at = seq(0, 1, 1 / (nrow(
                                         error
@@ -790,7 +790,7 @@ svaplot <- function(list,
                                 seq(zlim[1], zlim[2], round((zlim[2] - zlim[1]) / 10))
                         poly <-
                                 vector(mode = "list", length(icolors))
-                        plot(
+                        graphics::plot(
                                 1,
                                 1,
                                 t = "n",
@@ -804,7 +804,7 @@ svaplot <- function(list,
                                 xlab = 'intensity',
                                 frame.plot = F
                         )
-                        axis(
+                        graphics::axis(
                                 4,
                                 at = breaks,
                                 labels = round(breaks),
@@ -814,7 +814,7 @@ svaplot <- function(list,
                         bks <-
                                 seq(zlim[1], zlim[2], length.out = (length(icolors) + 1))
                         for (i in seq(poly)) {
-                                polygon(
+                                graphics::polygon(
                                         c(0.1, 0.1, 0.3, 0.3),
                                         c(bks[i], bks[i + 1], bks[i + 1], bks[i]),
                                         col = icolors[i],
@@ -829,13 +829,13 @@ svaplot <- function(list,
                 }
                 else if (pqvalues == "anova") {
                         message('Have SVs while p-values and q-values have no results')
-                        layout(matrix(rep(
+                        graphics::layout(matrix(rep(
                                 c(1, 1, 1, 2, 2, 3, 3, 4), 8
                         ), 8, 8, byrow = TRUE))
-                        par(mar = c(3, 6, 2, 3))
+                        graphics::par(mar = c(3, 6, 2, 3))
                         zlim <- range(c(data, signal2, error2))
 
-                        image(
+                        graphics::image(
                                 t(data),
                                 col = icolors,
                                 xlab = 'samples',
@@ -844,7 +844,7 @@ svaplot <- function(list,
                                 yaxt = "n",
                                 zlim = zlim
                         )
-                        axis(
+                        graphics::axis(
                                 1,
                                 at = seq(0, 1, 1 / (ncol(
                                         data
@@ -853,7 +853,7 @@ svaplot <- function(list,
                                 cex.axis = 0.618,
                                 las = 2
                         )
-                        axis(
+                        graphics::axis(
                                 2,
                                 at = seq(0, 1, 1 / (nrow(
                                         data
@@ -862,8 +862,8 @@ svaplot <- function(list,
                                 cex.axis = 0.618,
                                 las = 2
                         )
-                        par(mar = c(3, 3, 2, 1))
-                        image(
+                        graphics::par(mar = c(3, 3, 2, 1))
+                        graphics::image(
                                 t(signal2),
                                 col = icolors,
                                 xlab = 'samples',
@@ -872,7 +872,7 @@ svaplot <- function(list,
                                 yaxt = "n",
                                 zlim = zlim
                         )
-                        axis(
+                        graphics::axis(
                                 1,
                                 at = seq(0, 1, 1 / (
                                         ncol(signal2) - 1
@@ -881,8 +881,8 @@ svaplot <- function(list,
                                 cex.axis = 0.618,
                                 las = 2
                         )
-                        par(mar = c(3, 3, 2, 1))
-                        image(
+                        graphics::par(mar = c(3, 3, 2, 1))
+                        graphics::image(
                                 t(error2),
                                 col = icolors,
                                 xlab = 'samples',
@@ -891,7 +891,7 @@ svaplot <- function(list,
                                 yaxt = "n",
                                 zlim = zlim
                         )
-                        axis(
+                        graphics::axis(
                                 1,
                                 at = seq(0, 1, 1 / (ncol(
                                         error2
@@ -905,8 +905,8 @@ svaplot <- function(list,
                                 seq(zlim[1], zlim[2], round((zlim[2] - zlim[1]) / 10))
                         poly <-
                                 vector(mode = "list", length(icolors))
-                        par(mar = c(3, 0, 2, 3))
-                        plot(
+                        graphics::par(mar = c(3, 0, 2, 3))
+                        graphics::plot(
                                 1,
                                 1,
                                 t = "n",
@@ -920,7 +920,7 @@ svaplot <- function(list,
                                 xlab = 'intensity',
                                 frame.plot = F
                         )
-                        axis(
+                        graphics::axis(
                                 4,
                                 at = breaks,
                                 labels = round(breaks),
@@ -930,7 +930,7 @@ svaplot <- function(list,
                         bks <-
                                 seq(zlim[1], zlim[2], length.out = (length(icolors) + 1))
                         for (i in seq(poly)) {
-                                polygon(
+                                graphics::polygon(
                                         c(0.1, 0.1, 0.3, 0.3),
                                         c(bks[i], bks[i + 1], bks[i + 1], bks[i]),
                                         col = icolors[i],
@@ -942,10 +942,10 @@ svaplot <- function(list,
                          sum(pValuesSv < pt &
                              qValuesSv < qt) != 0) {
                         message('SVs corrected while p-values and q-values have results')
-                        layout(matrix(rep(
+                        graphics::layout(matrix(rep(
                                 c(1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6), 11
                         ), 11, 11, byrow = TRUE))
-                        par(mar = c(3, 4, 2, 1))
+                        graphics::par(mar = c(3, 4, 2, 1))
                         data <-
                                 data[pValuesSv < pt &
                                              qValuesSv < qt,]
@@ -963,7 +963,7 @@ svaplot <- function(list,
                         zlim <-
                                 range(c(data, signal, batch, error, datacor))
 
-                        image(
+                        graphics::image(
                                 t(data),
                                 col = icolors,
                                 xlab = 'samples',
@@ -972,7 +972,7 @@ svaplot <- function(list,
                                 yaxt = "n",
                                 zlim = zlim
                         )
-                        axis(
+                        graphics::axis(
                                 1,
                                 at = seq(0, 1, 1 / (ncol(
                                         data
@@ -981,7 +981,7 @@ svaplot <- function(list,
                                 cex.axis = 0.618,
                                 las = 2
                         )
-                        axis(
+                        graphics::axis(
                                 2,
                                 at = seq(0, 1, 1 / (nrow(
                                         data
@@ -991,7 +991,7 @@ svaplot <- function(list,
                                 las = 1
                         )
 
-                        image(
+                        graphics::image(
                                 t(signal),
                                 col = icolors,
                                 xlab = 'samples',
@@ -1000,7 +1000,7 @@ svaplot <- function(list,
                                 yaxt = "n",
                                 zlim = zlim
                         )
-                        axis(
+                        graphics::axis(
                                 1,
                                 at = seq(0, 1, 1 / (ncol(
                                         signal
@@ -1009,7 +1009,7 @@ svaplot <- function(list,
                                 cex.axis = 0.618,
                                 las = 2
                         )
-                        axis(
+                        graphics::axis(
                                 2,
                                 at = seq(0, 1, 1 / (nrow(
                                         signal
@@ -1019,7 +1019,7 @@ svaplot <- function(list,
                                 las = 1
                         )
 
-                        image(
+                        graphics::image(
                                 t(batch),
                                 col = icolors,
                                 xlab = 'samples',
@@ -1028,7 +1028,7 @@ svaplot <- function(list,
                                 yaxt = "n",
                                 zlim = zlim
                         )
-                        axis(
+                        graphics::axis(
                                 1,
                                 at = seq(0, 1, 1 / (ncol(
                                         batch
@@ -1037,7 +1037,7 @@ svaplot <- function(list,
                                 cex.axis = 0.618,
                                 las = 2
                         )
-                        axis(
+                        graphics::axis(
                                 2,
                                 at = seq(0, 1, 1 / (nrow(
                                         batch
@@ -1047,7 +1047,7 @@ svaplot <- function(list,
                                 las = 1
                         )
 
-                        image(
+                        graphics::image(
                                 t(error),
                                 col = icolors,
                                 xlab = 'samples',
@@ -1056,7 +1056,7 @@ svaplot <- function(list,
                                 yaxt = "n",
                                 zlim = zlim
                         )
-                        axis(
+                        graphics::axis(
                                 1,
                                 at = seq(0, 1, 1 / (ncol(
                                         error
@@ -1065,7 +1065,7 @@ svaplot <- function(list,
                                 cex.axis = 0.618,
                                 las = 2
                         )
-                        axis(
+                        graphics::axis(
                                 2,
                                 at = seq(0, 1, 1 / (nrow(
                                         error
@@ -1075,7 +1075,7 @@ svaplot <- function(list,
                                 las = 1
                         )
 
-                        image(
+                        graphics::image(
                                 t(datacor),
                                 col = icolors,
                                 xlab = 'samples',
@@ -1084,7 +1084,7 @@ svaplot <- function(list,
                                 yaxt = "n",
                                 zlim = zlim
                         )
-                        axis(
+                        graphics::axis(
                                 1,
                                 at = seq(0, 1, 1 / (
                                         ncol(datacor) - 1
@@ -1093,7 +1093,7 @@ svaplot <- function(list,
                                 cex.axis = 0.618,
                                 las = 2
                         )
-                        axis(
+                        graphics::axis(
                                 2,
                                 at = seq(0, 1, 1 / (
                                         nrow(datacor) - 1
@@ -1107,8 +1107,8 @@ svaplot <- function(list,
                                 seq(zlim[1], zlim[2], round((zlim[2] - zlim[1]) / 10))
                         poly <-
                                 vector(mode = "list", length(icolors))
-                        par(mar = c(3, 0, 2, 3))
-                        plot(
+                        graphics::par(mar = c(3, 0, 2, 3))
+                        graphics::plot(
                                 1,
                                 1,
                                 t = "n",
@@ -1122,7 +1122,7 @@ svaplot <- function(list,
                                 xlab = 'intensity',
                                 frame.plot = F
                         )
-                        axis(
+                        graphics::axis(
                                 4,
                                 at = breaks,
                                 labels = round(breaks),
@@ -1132,7 +1132,7 @@ svaplot <- function(list,
                         bks <-
                                 seq(zlim[1], zlim[2], length.out = (length(icolors) + 1))
                         for (i in seq(poly)) {
-                                polygon(
+                                graphics::polygon(
                                         c(0.1, 0.1, 0.3, 0.3),
                                         c(bks[i], bks[i + 1], bks[i + 1], bks[i]),
                                         col = icolors[i],
@@ -1150,14 +1150,14 @@ svaplot <- function(list,
                 }
                 else{
                         message('SVs corrected while p-values and q-values have no results')
-                        layout(matrix(rep(
+                        graphics::layout(matrix(rep(
                                 c(1, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 5, 6), 13
                         ), 13, 13, byrow = TRUE))
-                        par(mar = c(3, 6, 2, 3))
+                        graphics::par(mar = c(3, 6, 2, 3))
                         zlim <-
                                 range(c(signal, data, batch, error, datacor))
 
-                        image(
+                        graphics::image(
                                 t(data),
                                 col = icolors,
                                 xlab = 'samples',
@@ -1166,7 +1166,7 @@ svaplot <- function(list,
                                 yaxt = "n",
                                 zlim = zlim
                         )
-                        axis(
+                        graphics::axis(
                                 1,
                                 at = seq(0, 1, 1 / (ncol(
                                         data
@@ -1175,7 +1175,7 @@ svaplot <- function(list,
                                 cex.axis = 0.618,
                                 las = 2
                         )
-                        axis(
+                        graphics::axis(
                                 2,
                                 at = seq(0, 1, 1 / (nrow(
                                         data
@@ -1184,8 +1184,8 @@ svaplot <- function(list,
                                 cex.axis = 0.618,
                                 las = 2
                         )
-                        par(mar = c(3, 3, 2, 1))
-                        image(
+                        graphics::par(mar = c(3, 3, 2, 1))
+                        graphics::image(
                                 t(signal),
                                 col = icolors,
                                 xlab = 'samples',
@@ -1194,7 +1194,7 @@ svaplot <- function(list,
                                 yaxt = "n",
                                 zlim = zlim
                         )
-                        axis(
+                        graphics::axis(
                                 1,
                                 at = seq(0, 1, 1 / (ncol(
                                         signal
@@ -1203,8 +1203,8 @@ svaplot <- function(list,
                                 cex.axis = 0.618,
                                 las = 2
                         )
-                        par(mar = c(3, 3, 2, 1))
-                        image(
+                        graphics::par(mar = c(3, 3, 2, 1))
+                        graphics::image(
                                 t(batch),
                                 col = icolors,
                                 xlab = 'samples',
@@ -1213,7 +1213,7 @@ svaplot <- function(list,
                                 yaxt = "n",
                                 zlim = zlim
                         )
-                        axis(
+                        graphics::axis(
                                 1,
                                 at = seq(0, 1, 1 / (ncol(
                                         batch
@@ -1222,8 +1222,8 @@ svaplot <- function(list,
                                 cex.axis = 0.618,
                                 las = 2
                         )
-                        par(mar = c(3, 3, 2, 1))
-                        image(
+                        graphics::par(mar = c(3, 3, 2, 1))
+                        graphics::image(
                                 t(error),
                                 col = icolors,
                                 xlab = 'samples',
@@ -1232,7 +1232,7 @@ svaplot <- function(list,
                                 yaxt = "n",
                                 zlim = zlim
                         )
-                        axis(
+                        graphics::axis(
                                 1,
                                 at = seq(0, 1, 1 / (ncol(
                                         error
@@ -1241,8 +1241,8 @@ svaplot <- function(list,
                                 cex.axis = 0.618,
                                 las = 2
                         )
-                        par(mar = c(3, 6, 2, 3))
-                        image(
+                        graphics::par(mar = c(3, 6, 2, 3))
+                        graphics::image(
                                 t(datacor),
                                 col = icolors,
                                 xlab = 'samples',
@@ -1251,7 +1251,7 @@ svaplot <- function(list,
                                 yaxt = "n",
                                 zlim = zlim
                         )
-                        axis(
+                        graphics::axis(
                                 1,
                                 at = seq(0, 1, 1 / (
                                         ncol(datacor) - 1
@@ -1265,8 +1265,8 @@ svaplot <- function(list,
                                 seq(zlim[1], zlim[2], round((zlim[2] - zlim[1]) / 10))
                         poly <-
                                 vector(mode = "list", length(icolors))
-                        par(mar = c(3, 0, 2, 3))
-                        plot(
+                        graphics::par(mar = c(3, 0, 2, 3))
+                        graphics::plot(
                                 1,
                                 1,
                                 t = "n",
@@ -1280,7 +1280,7 @@ svaplot <- function(list,
                                 xlab = 'intensity',
                                 frame.plot = F
                         )
-                        axis(
+                        graphics::axis(
                                 4,
                                 at = breaks,
                                 labels = round(breaks),
@@ -1290,7 +1290,7 @@ svaplot <- function(list,
                         bks <-
                                 seq(zlim[1], zlim[2], length.out = (length(icolors) + 1))
                         for (i in seq(poly)) {
-                                polygon(
+                                graphics::polygon(
                                         c(0.1, 0.1, 0.3, 0.3),
                                         c(bks[i], bks[i + 1], bks[i + 1], bks[i]),
                                         col = icolors[i],
@@ -1316,7 +1316,7 @@ svaupload <- function(xset,
                 data <- raw$data
                 data <-
                         rbind(group = as.character(xset@phenoData[, 1]), data)
-                write.csv(data, file = 'Peaklist.csv')
+                utils::write.csv(data, file = 'Peaklist.csv')
                 return(data)
         }
         else{
@@ -1324,8 +1324,8 @@ svaupload <- function(xset,
                 data <- raw$data
                 data <-
                         rbind(group = as.character(xset@phenoData[, 1]), data)
-                write.csv(datacor, file = 'Peaklistcor.csv')
-                write.csv(data, file = 'Peaklist.csv')
+                utils::write.csv(datacor, file = 'Peaklistcor.csv')
+                utils::write.csv(data, file = 'Peaklist.csv')
                 return(list(data, datacor))
         }
 }

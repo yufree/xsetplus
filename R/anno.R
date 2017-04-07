@@ -156,13 +156,13 @@ mumdata <-
                 }
                 mz <- xset@groups[, 1]
                 rt <- xset@groups[, 4]
-                mod <- model.matrix(~ lv)
+                mod <- stats::model.matrix(~ lv)
                 mod0 <- as.matrix(c(rep(1, ncol(data))))
                 fstats <- sva::fstats(data, mod, mod0)
                 pvalue <- sva::f.pvalue(data, mod, mod0)
                 df <- cbind.data.frame(mz, rt, pvalue, fstats)
                 filename <- paste0(name, '.txt')
-                write.table(df,
+                utils::write.table(df,
                             file = filename,
                             sep = "\t",
                             row.names = F)

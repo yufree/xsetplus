@@ -15,7 +15,3 @@ export(svafanno)
 export(svapca)
 export(svaplot)
 export(svaupload)
-importFrom("graphics", "axis", "image", "layout", "par", "plot",
-             "polygon")
-importFrom("stats", "aggregate", "model.matrix", "prcomp")
-importFrom("utils", "write.csv", "write.table")

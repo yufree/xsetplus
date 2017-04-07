@@ -11,7 +11,7 @@
 getdata <-
         function(path,
                  index = F,
-                 BPPARAM = SnowParam(workers = 12),
+                 BPPARAM = BiocParallel::SnowParam(workers = 12),
                  pmethod = 'hplcorbitrap',
                  ...) {
                 cdffiles <- list.files(path, recursive = TRUE, full.names = TRUE)
@@ -20,7 +20,7 @@ getdata <-
                 }
                 if (pmethod == 'hplcorbitrap') {
                         xset <-
-                                xcmsSet(
+                                xcms::xcmsSet(
                                         cdffiles,
                                         BPPARAM = BPPARAM,
                                         method = "centWave",
@@ -32,21 +32,21 @@ getdata <-
                         if (index & length(index) == 1) {
                                 xset3 <- xset
                         } else{
-                                xset <- group(xset,
-                                              bw = 5,
-                                              mzwid = 0.015)
-                                xset2 <- retcor(xset)
+                                xset <- xcms::group(xset,
+                                                    bw = 5,
+                                                    mzwid = 0.015)
+                                xset2 <- xcms::retcor(xset)
                                 # you need group the peaks again for this corrected data
                                 xset2 <-
-                                        group(xset2,
-                                              bw = 5,
-                                              mzwid = 0.015)
+                                        xcms::group(xset2,
+                                                    bw = 5,
+                                                    mzwid = 0.015)
                                 xset3 <-
-                                        fillPeaks(xset2, BPPARAM = BPPARAM)
+                                        xcms::fillPeaks(xset2, BPPARAM = BPPARAM)
                         }
                 } else if (pmethod == 'uplcorbitrap') {
                         xset <-
-                                xcmsSet(
+                                xcms::xcmsSet(
                                         cdffiles,
                                         BPPARAM = BPPARAM,
                                         method = "centWave",
@@ -55,14 +55,17 @@ getdata <-
                                         prefilter = c(3, 5000),
                                         ...
                                 )
-                        xset <- group(xset, bw = 2, mzwid = 0.015)
-                        xset2 <- retcor(xset)
+                        xset <-
+                                xcms::group(xset, bw = 2, mzwid = 0.015)
+                        xset2 <- xcms::retcor(xset)
                         # you need group the peaks again for this corrected data
-                        xset2 <- group(xset2, bw = 2, mzwid = 0.015)
-                        xset3 <- fillPeaks(xset2, BPPARAM = BPPARAM)
+                        xset2 <-
+                                xcms::group(xset2, bw = 2, mzwid = 0.015)
+                        xset3 <-
+                                xcms::fillPeaks(xset2, BPPARAM = BPPARAM)
                 } else if (pmethod == 'hplcqtof') {
                         xset <-
-                                xcmsSet(
+                                xcms::xcmsSet(
                                         cdffiles,
                                         BPPARAM = BPPARAM,
                                         method = "centWave",
@@ -74,21 +77,21 @@ getdata <-
                         if (index & length(index) == 1) {
                                 xset3 <- xset
                         } else{
-                                xset <- group(xset,
-                                              bw = 5,
-                                              mzwid = 0.025)
-                                xset2 <- retcor(xset)
+                                xset <- xcms::group(xset,
+                                                    bw = 5,
+                                                    mzwid = 0.025)
+                                xset2 <- xcms::retcor(xset)
                                 # you need group the peaks again for this corrected data
                                 xset2 <-
-                                        group(xset2,
-                                              bw = 5,
-                                              mzwid = 0.025)
+                                        xcms::group(xset2,
+                                                    bw = 5,
+                                                    mzwid = 0.025)
                                 xset3 <-
-                                        fillPeaks(xset2, BPPARAM = BPPARAM)
+                                        xcms::fillPeaks(xset2, BPPARAM = BPPARAM)
                         }
                 } else if (pmethod == 'hplchqtof') {
                         xset <-
-                                xcmsSet(
+                                xcms::xcmsSet(
                                         cdffiles,
                                         BPPARAM = BPPARAM,
                                         method = "centWave",
@@ -100,21 +103,21 @@ getdata <-
                         if (index & length(index) == 1) {
                                 xset3 <- xset
                         } else{
-                                xset <- group(xset,
-                                              bw = 5,
-                                              mzwid = 0.015)
-                                xset2 <- retcor(xset)
+                                xset <- xcms::group(xset,
+                                                    bw = 5,
+                                                    mzwid = 0.015)
+                                xset2 <- xcms::retcor(xset)
                                 # you need group the peaks again for this corrected data
                                 xset2 <-
-                                        group(xset2,
-                                              bw = 5,
-                                              mzwid = 0.015)
+                                        xcms::group(xset2,
+                                                    bw = 5,
+                                                    mzwid = 0.015)
                                 xset3 <-
-                                        fillPeaks(xset2, BPPARAM = BPPARAM)
+                                        xcms::fillPeaks(xset2, BPPARAM = BPPARAM)
                         }
                 } else if (pmethod == 'uplcqtof') {
                         xset <-
-                                xcmsSet(
+                                xcms::xcmsSet(
                                         cdffiles,
                                         BPPARAM = BPPARAM,
                                         method = "centWave",
@@ -126,21 +129,21 @@ getdata <-
                         if (index & length(index) == 1) {
                                 xset3 <- xset
                         } else{
-                                xset <- group(xset,
-                                              bw = 2,
-                                              mzwid = 0.025)
-                                xset2 <- retcor(xset)
+                                xset <- xcms::group(xset,
+                                                    bw = 2,
+                                                    mzwid = 0.025)
+                                xset2 <- xcms::retcor(xset)
                                 # you need group the peaks again for this corrected data
                                 xset2 <-
-                                        group(xset2,
-                                              bw = 2,
-                                              mzwid = 0.025)
+                                        xcms::group(xset2,
+                                                    bw = 2,
+                                                    mzwid = 0.025)
                                 xset3 <-
-                                        fillPeaks(xset2, BPPARAM = BPPARAM)
+                                        xcms::fillPeaks(xset2, BPPARAM = BPPARAM)
                         }
                 } else if (pmethod == 'uplchqtof') {
                         xset <-
-                                xcmsSet(
+                                xcms::xcmsSet(
                                         cdffiles,
                                         BPPARAM = BPPARAM,
                                         method = "centWave",
@@ -152,29 +155,29 @@ getdata <-
                         if (index & length(index) == 1) {
                                 xset3 <- xset
                         } else{
-                                xset <- group(xset,
-                                              bw = 2,
-                                              mzwid = 0.015)
-                                xset2 <- retcor(xset)
+                                xset <- xcms::group(xset,
+                                                    bw = 2,
+                                                    mzwid = 0.015)
+                                xset2 <- xcms::retcor(xset)
                                 # you need group the peaks again for this corrected data
                                 xset2 <-
-                                        group(xset2,
-                                              bw = 2,
-                                              mzwid = 0.015)
+                                        xcms::group(xset2,
+                                                    bw = 2,
+                                                    mzwid = 0.015)
                                 xset3 <-
-                                        fillPeaks(xset2, BPPARAM = BPPARAM)
+                                        xcms::fillPeaks(xset2, BPPARAM = BPPARAM)
                         }
                 } else{
-                        xset <- xcmsSet(cdffiles, BPPARAM = BPPARAM, ...)
+                        xset <- xcms::xcmsSet(cdffiles, BPPARAM = BPPARAM, ...)
                         if (index & length(index) == 1) {
                                 xset3 <- xset
                         } else{
-                                xset <- group(xset)
-                                xset2 <- retcor(xset)
+                                xset <- xcms::group(xset)
+                                xset2 <- xcms::retcor(xset)
                                 # you need group the peaks again for this corrected data
-                                xset2 <- group(xset2)
+                                xset2 <- xcms::group(xset2)
                                 xset3 <-
-                                        fillPeaks(xset2, BPPARAM = BPPARAM)
+                                        xcms::fillPeaks(xset2, BPPARAM = BPPARAM)
                         }
                 }
                 return(xset3)
@@ -191,7 +194,7 @@ getupload <-
                  method = "medret",
                  intensity = 'inio',
                  name = 'Peaklist') {
-                peakIntensities <- groupval(xset, method, intensity)
+                peakIntensities <- xcms::groupval(xset, method, intensity)
                 if (intensity == "intb") {
                         peakIntensities[is.na(peakIntensities)] = 0
                 }
@@ -209,8 +212,8 @@ getupload <-
 #' @export
 gettechrep <- function(xset,
                        method =  'medret',
-                       intensity = 'into'){
-        data <- t(groupval(xset, method, intensity))
+                       intensity = 'into') {
+        data <- t(xcms::groupval(xset, method, intensity))
         lv <- xset@phenoData[, 1]
         mean <- aggregate(data, list(lv), mean)
         sd <- aggregate(data, list(lv), sd)
@@ -222,7 +225,7 @@ gettechrep <- function(xset,
                 c(paste0(name, 'mean'),
                   paste0(name, 'sd'),
                   paste0(name, 'rsd%'))
-        datap <- groups(xset)
+        datap <- xcms::groups(xset)
         report <- cbind.data.frame(datap, result)
         return(report)
 }
@@ -245,7 +248,7 @@ gettechbiorep <-
                  method =  'medret',
                  intensity = 'into',
                  ...) {
-                data <- t(groupval(xset, method, intensity, ...))
+                data <- t(xcms::groupval(xset, method, intensity, ...))
                 lv <- xset@phenoData[, 1]
                 lv2 <- xset@phenoData[, 2]
                 mean <- aggregate(data, list(lv, lv2), mean)
@@ -258,7 +261,7 @@ gettechbiorep <-
                         c(paste0(name, 'mean'),
                           paste0(name, 'sd'),
                           paste0(name, 'rsd%'))
-                datap <- groups(xset)
+                datap <- xcms::groups(xset)
                 report <- cbind.data.frame(datap, result)
                 if (anno) {
                         anno <-
@@ -290,8 +293,8 @@ getQCraw <- function(path, mzrange, rtrange, index = NULL) {
         nsamples <- length(cdffiles)
         area <- numeric()
         for (i in 1:nsamples) {
-                RAW <- xcmsRaw(cdffiles[i])
-                peak <- rawEIC(RAW, mzrange, rtrange)
+                RAW <- xcms::xcmsRaw(cdffiles[i])
+                peak <- xcms::rawEIC(RAW, mzrange, rtrange)
                 area[i] <- sum(peak$intensity)
         }
         return(area)

@@ -13,5 +13,5 @@ Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr
 biocViews:
-Imports: xcms, MAIT, xMSannotator, limma, sva, CAMERA, qvalue, RColorBrewer
+Imports: xcms,BiocParallel, MAIT, xMSannotator, limma, sva, CAMERA, qvalue, RColorBrewer
 RoxygenNote: 6.0.1

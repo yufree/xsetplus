@@ -1,9 +1,3 @@
-suppressWarnings(suppressPackageStartupMessages(library(xcms)))
-library(RColorBrewer)
-suppressPackageStartupMessages(library(sva))
-suppressPackageStartupMessages(library(limma))
-library(CAMERA)
-library(qvalue)
 #' @description surrogate variable analysis(SVA) to correct the unknown batch effects
 #' @param xset xcmsset object
 #' @param lv group information
@@ -23,8 +17,8 @@ svacor <-
                  method  = "medret",
                  intensity = 'into',
                  nSlaves = 12) {
-                data <- groupval(xset, method, intensity)
-                if(intensity == "intb"){
+                data <- xcms::groupval(xset, method, intensity)
+                if (intensity == "intb") {
                         data[is.na(data)] = 0
                 }
                 if (is.null(lv)) {
@@ -34,10 +28,10 @@ svacor <-
                 rt <- xset@groups[, 4]
                 mod <- model.matrix(~ lv)
                 mod0 <- as.matrix(c(rep(1, ncol(data))))
-                svafit <- sva(data, mod)
+                svafit <- sva::sva(data, mod)
                 if (svafit$n.sv == 0) {
                         svaX <- model.matrix(~ lv)
-                        lmfit <- lmFit(data, svaX)
+                        lmfit <- limma::lmFit(data, svaX)
                         signal <-
                                 lmfit$coef[, 1:nlevels(lv)] %*% t(svaX[, 1:nlevels(lv)])
                         error <- data - signal
@@ -45,12 +39,12 @@ svacor <-
                                 rownames(error) <- rownames(data)
                         colnames(signal) <-
                                 colnames(error) <- colnames(data)
-                        pValues = f.pvalue(data, mod, mod0)
-                        qValues = qvalue(pValues)
+                        pValues = sva::f.pvalue(data, mod, mod0)
+                        qValues = qvalue::qvalue(pValues)
                         qValues = qValues$qvalues
                         if (annotation) {
                                 dreport <-
-                                        annotateDiffreport(
+                                        CAMERA::annotateDiffreport(
                                                 xset,
                                                 metlin = T,
                                                 polarity = polarity,
@@ -101,7 +95,7 @@ svacor <-
                 else{
                         message('Data is correcting ...')
                         svaX <- model.matrix(~ lv + svafit$sv)
-                        lmfit <- lmFit(data, svaX)
+                        lmfit <- limma::lmFit(data, svaX)
                         batch <-
                                 lmfit$coef[, (nlevels(lv) + 1):(nlevels(lv) + svafit$n.sv)] %*% t(svaX[, (nlevels(lv) +
                                                                                                                   1):(nlevels(lv) + svafit$n.sv)])
@@ -110,7 +104,7 @@ svacor <-
                         error <- data - signal - batch
                         datacor <- signal + error
                         svaX2 <- model.matrix(~ lv)
-                        lmfit2 <- lmFit(data, svaX2)
+                        lmfit2 <- limma::lmFit(data, svaX2)
                         signal2 <-
                                 lmfit2$coef[, 1:nlevels(lv)] %*% t(svaX2[, 1:nlevels(lv)])
                         error2 <- data - signal2
@@ -129,11 +123,11 @@ svacor <-
 
                         modSv = cbind(mod, svafit$sv)
                         mod0Sv = cbind(mod0, svafit$sv)
-                        pValuesSv = f.pvalue(data, modSv, mod0Sv)
-                        qValuesSv = qvalue(pValuesSv)
+                        pValuesSv = sva::f.pvalue(data, modSv, mod0Sv)
+                        qValuesSv = qvalue::qvalue(pValuesSv)
                         qValuesSv = qValuesSv$qvalues
 
-                        pValues = f.pvalue(data, mod, mod0)
+                        pValues = sva::f.pvalue(data, mod, mod0)
                         qValues = qvalue(pValues)
                         qValues = qValues$qvalues
                         if (annotation) {
@@ -357,7 +351,8 @@ svadata <- function(list,
                         li <-
                                 list(data, pValues < pt &
                                              qValues < qt, mz, rt)
-                        names(li) <- c('data', 'pqvalues', 'mz', 'rt')
+                        names(li) <-
+                                c('data', 'pqvalues', 'mz', 'rt')
                         return(li)
                 }
                 else{
@@ -438,7 +433,7 @@ svaplot <- function(list,
         qValuesSv <- list$'q-valuesCorrected'
 
         icolors <-
-                colorRampPalette(rev(brewer.pal(11, "RdYlBu")))(100)
+                RColorBrewer::colorRampPalette(rev(RColorBrewer::brewer.pal(11, "RdYlBu")))(100)
 
         if (is.null(signal2)) {
                 if (pqvalues == "anova" & sum(pValues < pt & qValues < qt) != 0) {
@@ -1312,21 +1307,25 @@ svaplot <- function(list,
 #' @return csv files for both raw and corrected data for metabolanalyst if SVA could be applied
 #' @export
 svaupload <- function(xset,
-                      lv = NULL
-                      ){
-        raw <- svacor(xset,lv=lv,annotation = F,nSlaves = 12)
+                      lv = NULL) {
+        raw <- svacor(xset,
+                      lv = lv,
+                      annotation = F,
+                      nSlaves = 12)
         if (is.null(raw$dataCorrected)) {
                 data <- raw$data
-                data <- rbind(group = as.character(xset@phenoData[, 1]), data)
-                write.csv(data, file='Peaklist.csv')
+                data <-
+                        rbind(group = as.character(xset@phenoData[, 1]), data)
+                write.csv(data, file = 'Peaklist.csv')
                 return(data)
         }
         else{
                 datacor <- raw$dataCorrected
                 data <- raw$data
-                data <- rbind(group = as.character(xset@phenoData[, 1]), data)
-                write.csv(datacor, file='Peaklistcor.csv')
-                write.csv(data, file='Peaklist.csv')
-                return(list(data,datacor))
+                data <-
+                        rbind(group = as.character(xset@phenoData[, 1]), data)
+                write.csv(datacor, file = 'Peaklistcor.csv')
+                write.csv(data, file = 'Peaklist.csv')
+                return(list(data, datacor))
         }
 }

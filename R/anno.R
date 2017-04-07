@@ -1,5 +1,3 @@
-suppressPackageStartupMessages(library(MAIT))
-suppressPackageStartupMessages(library(xMSannotator))
 #' @description annotation with MAIT package
 #' @param path the path to your data
 #' @param name the name of your project
@@ -13,9 +11,9 @@ suppressPackageStartupMessages(library(xMSannotator))
 #' @export
 
 anno <- function(path, name, mode = NULL) {
-        MAIT <- sampleProcessing(dataDir = path, project = name)
+        MAIT <- MAIT::sampleProcessing(dataDir = path, project = name)
         MAIT <-
-                peakAnnotation(
+                MAIT::peakAnnotation(
                         MAIT.object = MAIT,
                         corrWithSamp = 0.7,
                         corrBetSamp = 0.75,
@@ -23,25 +21,29 @@ anno <- function(path, name, mode = NULL) {
                         adductTable = mode
                 )
         MAIT <-
-                spectralSigFeatures(
+                MAIT::spectralSigFeatures(
                         MAIT.object = MAIT,
                         pvalue = 0.05,
                         p.adj = "BH",
                         scale = FALSE
                 )
         signTable <-
-                sigPeaksTable(MAIT.object = MAIT, printCSVfile = T)
-        Biotransformations(MAIT.object = MAIT, peakPrecision = 0.005)
-        if(mode == 'negAdducts'){
+                MAIT::sigPeaksTable(MAIT.object = MAIT, printCSVfile = T)
+        MAIT::Biotransformations(MAIT.object = MAIT, peakPrecision = 0.005)
+        if (mode == 'negAdducts') {
                 modename = 'negative'
-        }else{
+        } else{
                 modename = 'positive'
         }
         MAIT <-
-                identifyMetabolites(MAIT.object = MAIT, peakTolerance = 0.005, polarity = modename)
-        metTable <- metaboliteTable(MAIT)
+                MAIT::identifyMetabolites(
+                        MAIT.object = MAIT,
+                        peakTolerance = 0.005,
+                        polarity = modename
+                )
+        metTable <- MAIT::metaboliteTable(MAIT)
         head(metTable)
-        return(list(signTable,metTable))
+        return(list(signTable, metTable))
 }
 
 #' @description annotation with xMSannotator package
@@ -62,12 +64,29 @@ fanno <-
         function(xset,
                  outloc = "./result/",
                  mode = 'pos',
-                 list = c("M+2H","M+H+NH4","M+ACN+2H","M+2ACN+2H","M+H","M+NH4","M+Na","M+ACN+H","M+ACN+Na","M+2ACN+H","2M+H","2M+Na","2M+ACN+H","M+2Na-H","M+H-H2O","M+H-2H2O"),
+                 list = c(
+                         "M+2H",
+                         "M+H+NH4",
+                         "M+ACN+2H",
+                         "M+2ACN+2H",
+                         "M+H",
+                         "M+NH4",
+                         "M+Na",
+                         "M+ACN+H",
+                         "M+ACN+Na",
+                         "M+2ACN+H",
+                         "2M+H",
+                         "2M+Na",
+                         "2M+ACN+H",
+                         "M+2Na-H",
+                         "M+H-H2O",
+                         "M+H-2H2O"
+                 ),
                  db_name = 'HMDB') {
                 data(adduct_weights)
-                data <- groupval(xset, 'medret', "into")
-                mz <- groups(xset)[, 1]
-                time <- groups(xset)[, 4]
+                data <- xcms::groupval(xset, 'medret', "into")
+                mz <- xcms::groups(xset)[, 1]
+                time <- xcms::groups(xset)[, 4]
                 data <- as.data.frame(cbind(mz, time, data))
                 data <- unique(data)
                 annotres <-
@@ -118,25 +137,33 @@ fanno <-
 #' @references Li, S.; Park, Y.; Duraisingham, S.; Strobel, F. H.; Khan, N.; Soltow, Q. A.; Jones, D. P.; Pulendran, B. PLOS Computational Biology 2013, 9 (7), e1003123.
 
 #' @export
-mumdata <- function(xset, lv = NULL, name = 'test', method = "medret", intensity = 'inio'){
-        data <- xcms::groupval(xset, method, intensity)
-        if(intensity == "intb"){
-                data[is.na(data)] = 0
+mumdata <-
+        function(xset,
+                 lv = NULL,
+                 name = 'test',
+                 method = "medret",
+                 intensity = 'inio') {
+                data <- xcms::groupval(xset, method, intensity)
+                if (intensity == "intb") {
+                        data[is.na(data)] = 0
+                }
+                if (is.null(lv)) {
+                        lv <- xset@phenoData[, 1]
+                }
+                mz <- xset@groups[, 1]
+                rt <- xset@groups[, 4]
+                mod <- model.matrix(~ lv)
+                mod0 <- as.matrix(c(rep(1, ncol(data))))
+                fstats <- sva::fstats(data, mod, mod0)
+                pvalue <- sva::f.pvalue(data, mod, mod0)
+                df <- cbind.data.frame(mz, rt, pvalue, fstats)
+                filename <- paste0(name, '.txt')
+                write.table(df,
+                            file = filename,
+                            sep = "\t",
+                            row.names = F)
+                return(df)
         }
-        if (is.null(lv)) {
-                lv <- xset@phenoData[, 1]
-        }
-        mz <- xset@groups[, 1]
-        rt <- xset@groups[, 4]
-        mod <- model.matrix(~ lv)
-        mod0 <- as.matrix(c(rep(1, ncol(data))))
-        fstats <- sva::fstats(data,mod,mod0)
-        pvalue <- sva::f.pvalue(data,mod,mod0)
-        df <- cbind.data.frame(mz,rt,pvalue,fstats)
-        filename <- paste0(name,'.txt')
-        write.table(df, file = filename, sep = "\t",row.names = F)
-        return(df)
-}
 
 #' @description annotation with MAIT package of list from svacor function
 #' @param raw the list from svacor function
@@ -152,7 +179,7 @@ svaanno <-
                  polarity = "positive",
                  projectname = "test") {
                 if (is.null(raw$dataCorrected)) {
-                        table <- MAITbuilder(
+                        table <- MAIT::MAITbuilder(
                                 data = raw$data,
                                 spectraID = NULL,
                                 masses = raw$mz,
@@ -164,7 +191,7 @@ svaanno <-
                                 corThresh = 0.7
                         )
                 } else{
-                        table <- MAITbuilder(
+                        table <- MAIT::MAITbuilder(
                                 data = raw$dataCorrected,
                                 spectraID = NULL,
                                 masses = raw$mz,
@@ -177,14 +204,14 @@ svaanno <-
                         )
                 }
                 if (polarity == 'positive') {
-                        importMAIT <- Biotransformations(
+                        importMAIT <- MAIT::Biotransformations(
                                 MAIT.object = table,
                                 adductAnnotation = TRUE,
                                 peakPrecision = 0.005,
                                 adductTable = NULL
                         )
                 } else{
-                        importMAIT <- Biotransformations(
+                        importMAIT <- MAIT::Biotransformations(
                                 MAIT.object = table,
                                 adductAnnotation = TRUE,
                                 peakPrecision = 0.005,
@@ -192,7 +219,7 @@ svaanno <-
                         )
                 }
 
-                importMAIT <- identifyMetabolites(
+                importMAIT <- MAIT::identifyMetabolites(
                         MAIT.object = importMAIT,
                         peakTolerance = 0.005,
                         polarity = polarity,
@@ -212,7 +239,24 @@ svaanno <-
 svafanno <- function(raw,
                      outloc = "./result/",
                      mode = 'pos',
-                     list = c("M+2H","M+H+NH4","M+ACN+2H","M+2ACN+2H","M+H","M+NH4","M+Na","M+ACN+H","M+ACN+Na","M+2ACN+H","2M+H","2M+Na","2M+ACN+H","M+2Na-H","M+H-H2O","M+H-2H2O"),
+                     list = c(
+                             "M+2H",
+                             "M+H+NH4",
+                             "M+ACN+2H",
+                             "M+2ACN+2H",
+                             "M+H",
+                             "M+NH4",
+                             "M+Na",
+                             "M+ACN+H",
+                             "M+ACN+Na",
+                             "M+2ACN+H",
+                             "2M+H",
+                             "2M+Na",
+                             "2M+ACN+H",
+                             "M+2Na-H",
+                             "M+H-H2O",
+                             "M+H-2H2O"
+                     ),
                      db_name = 'HMDB') {
         data(adduct_weights)
         if (is.null(raw$dataCorrected)) {
@@ -225,7 +269,7 @@ svafanno <- function(raw,
         time <- raw$rt
         data <- as.data.frame(cbind(mz, time, data))
         annotres <-
-                multilevelannotation(
+                xMSannotator::multilevelannotation(
                         dataA = data,
                         max.mz.diff = 5,
                         max.rt.diff = 10,

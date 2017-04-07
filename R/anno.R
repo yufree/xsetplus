@@ -1,13 +1,17 @@
-#' @description annotation with MAIT package
+suppressPackageStartupMessages(library(MAIT))
+suppressPackageStartupMessages(library(xMSannotator))
+#' Annotation with MAIT package
 #' @param path the path to your data
 #' @param name the name of your project
-#' @param ion defalut is for positive mode, otherwise use 'negAdducts' for negative
+#' @param mode defalut is for positive mode, otherwise use 'negAdducts' for negative
 #' @return as shown in MAIT package
 #' @references Fernández-Albert, F.; Llorach, R.; Andrés-Lacueva, C.; Perera, A. Bioinformatics 2014, 30 (13), 1937–1939.
 #' @examples
+#' \dontrun{
 #' path <- "./data/"
 #' name <- "fishriver"
 #' anno(path,name)
+#' }
 #' @export
 
 anno <- function(path, name, mode = NULL) {
@@ -45,7 +49,7 @@ anno <- function(path, name, mode = NULL) {
         return(list(signTable, metTable))
 }
 
-#' @description annotation with xMSannotator package
+#' Annotation with xMSannotator package
 #' @param xset a xcmsset object to be annotated
 #' @param outloc the path for your result
 #' @param mode defalut is for positive mode, otherwise use 'neg' for negative
@@ -54,9 +58,11 @@ anno <- function(path, name, mode = NULL) {
 #' @return as shown in xMSannotator package
 #' @references Uppal, K.; Walker, D. I.; Jones, D. P. Anal. Chem. 2017, 89 (2), 1063–1067.
 #' @examples
+#' \dontrun{
 #' path <- "./data/"
 #' xset <- getdata(path)
 #' result <- fanno(xset)
+#' }
 #' @export
 
 fanno <-
@@ -124,12 +130,12 @@ fanno <-
                 return(annotres)
         }
 
-#' @description output pathway annotation data for Mummichog algorithm
+#' Output pathway annotation data for Mummichog algorithm
 #' @param xset a xcmsset object to be annotated
 #' @param lv the group factor
 #' @param name the file name
 #' @param method parameter for groupval function
-#' @param instensity parameter for groupval function
+#' @param intensity parameter for groupval function
 #' @details use 'python2 main.py -c 0.05 -f test.txt -p 100 -m negative -o myoutput' to get the Mummichog annotation
 #' @return text file for Mummichog algorithm
 #' @references Li, S.; Park, Y.; Duraisingham, S.; Strobel, F. H.; Khan, N.; Soltow, Q. A.; Jones, D. P.; Pulendran, B. PLOS Computational Biology 2013, 9 (7), e1003123.
@@ -163,7 +169,7 @@ mumdata <-
                 return(df)
         }
 
-#' @description annotation with MAIT package of list from svacor function
+#' Annotation with MAIT package of list from svacor function
 #' @param raw the list from svacor function
 #' @param lv group information
 #' @param polarity defalut is for positive mode, otherwise use 'negative' for negative
@@ -225,8 +231,8 @@ svaanno <-
                 )
                 return(importMAIT)
         }
-#' @description annotation with xMSannotator package
-#' @param xset a xcmsset object to be annotated
+#' Annotation with xMSannotator package
+#' @param raw a xcmsset object to be annotated
 #' @param outloc the path for your result
 #' @param mode defalut is for positive mode, otherwise use 'neg' for negative
 #' @param list adductlist for annotation. the default adductlist is queryadductlist=c("M+2H","M+H+NH4","M+ACN+2H","M+2ACN+2H","M+H","M+NH4","M+Na","M+ACN+H","M+ACN+Na","M+2ACN+H","2M+H","2M+Na","2M+ACN+H","M+2Na-H","M+H-H2O","M+H-2H2O") . You might use other options for negative mode: c("M-H","M-H2O-H","M+Na-2H","M+Cl","M+FA-H"); c("positive"); c("negative"); c("all");see data(adduct_table) for complete list

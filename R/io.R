@@ -1,4 +1,4 @@
-#' @description Get xcmsset object in one step with optimized methods.
+#' Get xcmsset object in one step with optimized methods.
 #' @param path the path to your data
 #' @param index the index of the files
 #' @param BPPARAM used for BiocParallel package
@@ -185,7 +185,7 @@ getdata <-
 #' Get the csv files to be submitted to Metaboanalyst
 #' @param xset the xcmsset object which you want to submitted to Metaboanalyst
 #' @param method parameter for groupval function
-#' @param instensity parameter for groupval function
+#' @param intensity parameter for groupval function
 #' @param name file name
 #' @return dataframe with data needed for Metaboanalyst if your want to perform local analysis.
 #' @export
@@ -199,15 +199,15 @@ getupload <-
                         peakIntensities[is.na(peakIntensities)] = 0
                 }
                 data <-
-                        rbind(group = as.character(phenoData(xset)$class), peakIntensities)
+                        rbind(group = as.character(xcms::phenoData(xset)$class), peakIntensities)
                 filename <- paste0(name, '.csv')
                 write.csv(data, file = filename)
                 return(data)
         }
-#' @description Get the report for technique replicates.
+#' Get the report for technique replicates.
 #' @param xset the xcmsset object which for all of your technique replicates for one sample
 #' @param method parameter for groupval function
-#' @param instensity parameter for groupval function
+#' @param intensity parameter for groupval function
 #' @return dataframe with mean, standard deviation and RSD for those technique replicates combined with raw data
 #' @export
 gettechrep <- function(xset,
@@ -229,15 +229,13 @@ gettechrep <- function(xset,
         report <- cbind.data.frame(datap, result)
         return(report)
 }
-#' @description Get the report for samples with technique replicates
+#' Get the report for samples with technique replicates
 #' @param xset the xcmsset object all of samples with technique replicates
-#' @param method parameter for groupval function
-#' @param instensity parameter for groupval function
 #' @param anno logical if set as True, it will return the table for further annotation, default false
 #' @param peaklist logical if set as True, it will return csv files for metaboanalyst, default false
 #' @param file file name for the peaklist
 #' @param method parameter for groupval function
-#' @param instensity parameter for groupval function
+#' @param intensity parameter for groupval function
 #' @return dataframe with mean, standard deviation and RSD for those technique replicates combined with raw data for all of the samples if anno and peaklist are defaults false.
 #' @export
 gettechbiorep <-
@@ -246,9 +244,8 @@ gettechbiorep <-
                  peaklist = F,
                  file = NULL,
                  method =  'medret',
-                 intensity = 'into',
-                 ...) {
-                data <- t(xcms::groupval(xset, method, intensity, ...))
+                 intensity = 'into') {
+                data <- t(xcms::groupval(xset, method, intensity))
                 lv <- xset@phenoData[, 1]
                 lv2 <- xset@phenoData[, 2]
                 mean <- aggregate(data, list(lv, lv2), mean)
@@ -278,7 +275,7 @@ gettechbiorep <-
                         return(report)
                 }
         }
-#' @description get the data of QC compound for a group of data
+#' get the data of QC compound for a group of data
 #' @param path data path for your QC samples
 #' @param mzrange mass of the QC compound
 #' @param rtrange retention time of the QC compound

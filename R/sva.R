@@ -1,10 +1,10 @@
-#' @description surrogate variable analysis(SVA) to correct the unknown batch effects
+#' Surrogate variable analysis(SVA) to correct the unknown batch effects
 #' @param xset xcmsset object
 #' @param lv group information
 #' @param annotation logical annotation with CAMERA package
 #' @param polarity 'positive' or 'negative' for annotation
 #' @param method parameter for groupval function
-#' @param instensity parameter for groupval function
+#' @param intensity parameter for groupval function
 #' @param nSlaves parameter for CAMARA, although xcms depute it
 #' @details this is used for reviesed version of SVA to correct the unknown batch effects
 #' @return list object with various components such raw data, corrected data, signal part, random errors part, batch part, p-values, q-values, mass, rt, Posterior Probabilities of Surrogate variables and Posterior Probabilities of Mod. If no surrogate variable found, corresponding part would miss.
@@ -128,11 +128,11 @@ svacor <-
                         qValuesSv = qValuesSv$qvalues
 
                         pValues = sva::f.pvalue(data, mod, mod0)
-                        qValues = qvalue(pValues)
+                        qValues = qvalue::qvalue(pValues)
                         qValues = qValues$qvalues
                         if (annotation) {
                                 dreport <-
-                                        annotateDiffreport(
+                                        CAMERA::annotateDiffreport(
                                                 xset,
                                                 metlin = T,
                                                 polarity = polarity,
@@ -221,7 +221,7 @@ svacor <-
                 }
                 return(li)
         }
-#' @description Principal component analysis(PCA) for SVA corrected data and raw data
+#' Principal component analysis(PCA) for SVA corrected data and raw data
 #' @param list results from svacor function
 #' @param center parameters for PCA
 #' @param scale parameters for scale
@@ -320,7 +320,7 @@ svapca <- function(list,
                 main = "PCA-corrected"
         )
 }
-#' @description Filter the data with p value and q value
+#' Filter the data with p value and q value
 #' @param list results from svacor function
 #' @param pqvalues method for ANOVA or SVA
 #' @param pt threshold for p value, default is 0.05
@@ -409,7 +409,7 @@ svadata <- function(list,
                 }
         }
 }
-#' @description Filter the data with p value and q value and show them
+#' Filter the data with p value and q value and show them
 #' @param list results from svacor function
 #' @param pqvalues method for ANOVA or SVA
 #' @param pt threshold for p value, default is 0.05
@@ -433,7 +433,7 @@ svaplot <- function(list,
         qValuesSv <- list$'q-valuesCorrected'
 
         icolors <-
-                RColorBrewer::colorRampPalette(rev(RColorBrewer::brewer.pal(11, "RdYlBu")))(100)
+                colorRampPalette(rev(RColorBrewer::brewer.pal(11, "RdYlBu")))(100)
 
         if (is.null(signal2)) {
                 if (pqvalues == "anova" & sum(pValues < pt & qValues < qt) != 0) {
@@ -1301,7 +1301,7 @@ svaplot <- function(list,
         }
 }
 
-#' @description get the corrected data after SVA for metabolanalyst
+#' Get the corrected data after SVA for metabolanalyst
 #' @param xset xcmsset object
 #' @param lv group information
 #' @return csv files for both raw and corrected data for metabolanalyst if SVA could be applied

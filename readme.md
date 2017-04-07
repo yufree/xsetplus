@@ -22,5 +22,4 @@ devtools::install_github('yufree/xMSannotator')
 devtools::install_github('yufree/sva-devel')
 devtools::install_github('yufree/xsetplus')
 library('xsetplus')
-library('xMSannotator')
 ```

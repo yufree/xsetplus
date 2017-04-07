@@ -11,9 +11,9 @@ getupload(xset, method = "medret", intensity = "inio", name = "Peaklist")
 
 \item{method}{parameter for groupval function}
 
-\item{name}{file name}
+\item{intensity}{parameter for groupval function}
 
-\item{instensity}{parameter for groupval function}
+\item{name}{file name}
 }
 \value{
 dataframe with data needed for Metaboanalyst if your want to perform local analysis.

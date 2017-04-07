@@ -83,7 +83,14 @@ fanno <-
                  ),
                  db_name = 'HMDB') {
                 adduct_weights = cbind.data.frame(Adduct = c('M+H','M-H'),Weight = c(5,5))
-                data("adduct_table")
+                data("adduct_table",package = 'xMSannotator')
+                data("keggCompMZ",package = 'xMSannotator')
+                data("keggotherinf",package = 'xMSannotator')
+                data("lipidmapsCompMZ",package = 'xMSannotator')
+                data("t3dbCompMZ",package = 'xMSannotator')
+                data("t3dbotherinf",package = 'xMSannotator')
+                data("hmdbAllinf",package = 'xMSannotator')
+                data("hmdbCompMZ",package = 'xMSannotator')
                 data <- xcms::groupval(xset, 'medret', "into")
                 mz <- xcms::groups(xset)[, 1]
                 time <- xcms::groups(xset)[, 4]

@@ -4,7 +4,7 @@
 \alias{getupload}
 \title{Get the csv files to be submitted to Metaboanalyst}
 \usage{
-getupload(xset, method = "medret", intensity = "inio", name = "Peaklist")
+getupload(xset, method = "medret", intensity = "into", name = "Peaklist")
 }
 \arguments{
 \item{xset}{the xcmsset object which you want to submitted to Metaboanalyst}

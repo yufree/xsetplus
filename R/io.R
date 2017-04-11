@@ -200,6 +200,7 @@ getupload <-
                 }
                 data <-
                         rbind(group = as.character(xcms::phenoData(xset)$class), peakIntensities)
+                data <- data[!duplicate(rownames(data)),]
                 filename <- paste0(name, '.csv')
                 utils::write.csv(data, file = filename)
                 return(data)

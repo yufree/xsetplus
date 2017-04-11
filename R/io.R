@@ -192,7 +192,7 @@ getdata <-
 getupload <-
         function(xset,
                  method = "medret",
-                 intensity = 'inio',
+                 intensity = 'into',
                  name = 'Peaklist') {
                 peakIntensities <- xcms::groupval(xset, method, intensity)
                 if (intensity == "intb") {

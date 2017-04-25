@@ -88,14 +88,14 @@ fanno <-
                          "M+H-H2O",
                          "M+H-2H2O"
                  ),
-                 db_name = 'HMDB',...) {
+                 db_name = 'HMDB', ...) {
                 data <- xcms::groupval(xset, 'medret', "into")
                 adduct_weights = cbind.data.frame(Adduct = c('M+H','M-H'),Weight = c(5,5))
                 mz <- xcms::groups(xset)[, 1]
                 time <- xcms::groups(xset)[, 4]
                 data <- as.data.frame(cbind(mz, time, data))
                 data <- unique(data)
-                if(mode == 'neg'){
+                if ( mode == 'neg') {
                         annotres <-
                                 xMSannotator::multilevelannotation(
                                         dataA = data,
@@ -309,7 +309,7 @@ svafanno <- function(raw,
         mz <- raw$mz
         time <- raw$rt
         data <- as.data.frame(cbind(mz, time, data))
-        if(mode == 'neg'){
+        if( mode == 'neg' ){
                 annotres <-
                         xMSannotator::multilevelannotation(
                                 dataA = data,

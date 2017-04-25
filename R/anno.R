@@ -96,6 +96,7 @@ fanno <-
                 data <- as.data.frame(cbind(mz, time, data))
                 data <- unique(data)
                 if ( mode == 'neg') {
+                        print('hello')
                         annotres <-
                                 xMSannotator::multilevelannotation(
                                         dataA = data,

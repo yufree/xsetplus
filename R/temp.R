@@ -189,3 +189,28 @@ getopqtofdata <- function(path,
         }
         return(xset3)
 }
+
+#' @export
+getxcms3 <- function(path,
+                     index = F,
+                     cwp = CentWaveParam(snthresh = 20, noise = 1000),
+                     rtc = ObiwarpParam(),
+                     pdp = PeakDensityParam(sampleGroups = pData(xod)$sample_group,maxFeatures = 300, minFraction = 0.3),
+                     ...){
+        cdffiles <- list.files(path, recursive = TRUE, full.names = TRUE)
+
+        if (index) {
+                cdffiles <- cdffiles[index]
+        }
+        xod <- xcms::readMSData2(cdffiles)
+        ## Find peaks
+        xod <- xcms::findChromPeaks(xod,param = cwp)
+        ## Doing the obiwarp alignment using the default settings.
+        xod <- xcms::adjustRtime(xod, param = rtc)
+        ## Group the peaks
+        xod <- xcms::groupChromPeaks(xod, param = pdp)
+        ## Fill in peaks with default settings. Settings can be adjusted by passing
+        ## a FillChromPeaksParam object to the method.
+        xod <- xcms::fillChromPeaks(xod)
+        return(xod)
+}

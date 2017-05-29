@@ -419,7 +419,8 @@ svadata <- function(list,
 svaplot <- function(list,
                     pqvalues = "sv",
                     pt = 0.05,
-                    qt = 0.05) {
+                    qt = 0.05,
+                    lv = NULL) {
         data <- list$data
         signal <- list$signal
         signal2 <- list$signal2
@@ -431,6 +432,11 @@ svaplot <- function(list,
         qValues <- list$'q-values'
         pValuesSv <- list$'p-valuesCorrected'
         qValuesSv <- list$'q-valuesCorrected'
+        if(is.null(lv)){
+                lv <- as.factor(colnames(data))
+        }
+        pos <- cumsum(as.numeric(table(lv)/sum(table(lv))))-as.numeric(table(lv)/sum(table(lv)))/2
+        posv <- cumsum(as.numeric(table(lv)/sum(table(lv))))[1:(nlevels(lv)-1)]
 
         icolors <-
                 grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(11, "RdYlBu")))(100)
@@ -461,12 +467,9 @@ svaplot <- function(list,
                         )
                         graphics::axis(
                                 1,
-                                at = seq(0, 1, 1 / (ncol(
-                                        data
-                                ) - 1)),
-                                labels = colnames(data),
-                                cex.axis = 0.618,
-                                las = 2
+                                at = pos,
+                                labels = levels(lv),
+                                cex.axis = 0.8
                         )
                         graphics::axis(
                                 2,
@@ -474,9 +477,10 @@ svaplot <- function(list,
                                         data
                                 ) - 1)),
                                 labels = rownames(data),
-                                cex.axis = 0.618,
+                                cex.axis = 1,
                                 las = 2
                         )
+                        abline(v = posv)
 
                         graphics::image(
                                 t(signal),
@@ -489,12 +493,9 @@ svaplot <- function(list,
                         )
                         graphics::axis(
                                 1,
-                                at = seq(0, 1, 1 / (ncol(
-                                        signal
-                                ) - 1)),
-                                labels = colnames(signal),
-                                cex.axis = 0.618,
-                                las = 2
+                                at = pos,
+                                labels = levels(lv),
+                                cex.axis = 0.8
                         )
                         graphics::axis(
                                 2,
@@ -502,9 +503,10 @@ svaplot <- function(list,
                                         signal
                                 ) - 1)),
                                 labels = rownames(signal),
-                                cex.axis = 0.618,
+                                cex.axis = 1,
                                 las = 2
                         )
+                        abline(v = posv)
 
                         graphics::image(
                                 t(error),
@@ -517,12 +519,9 @@ svaplot <- function(list,
                         )
                         graphics::axis(
                                 1,
-                                at = seq(0, 1, 1 / (ncol(
-                                        error
-                                ) - 1)),
-                                labels = colnames(error),
-                                cex.axis = 0.618,
-                                las = 2
+                                at = pos,
+                                labels = levels(lv),
+                                cex.axis = 0.8
                         )
                         graphics::axis(
                                 2,
@@ -530,9 +529,10 @@ svaplot <- function(list,
                                         error
                                 ) - 1)),
                                 labels = rownames(error),
-                                cex.axis = 0.618,
+                                cex.axis = 1,
                                 las = 2
                         )
+                        abline(v = posv)
 
                         breaks <-
                                 seq(zlim[1], zlim[2], round((zlim[2] - zlim[1]) / 10))
@@ -594,12 +594,9 @@ svaplot <- function(list,
                         )
                         graphics::axis(
                                 1,
-                                at = seq(0, 1, 1 / (ncol(
-                                        data
-                                ) - 1)),
-                                labels = colnames(data),
-                                cex.axis = 0.618,
-                                las = 2
+                                at = pos,
+                                labels = levels(lv),
+                                cex.axis = 0.8
                         )
                         graphics::axis(
                                 2,
@@ -607,9 +604,10 @@ svaplot <- function(list,
                                         data
                                 ) - 1)),
                                 labels = rownames(data),
-                                cex.axis = 0.618,
+                                cex.axis = 1,
                                 las = 2
                         )
+                        abline(v = posv)
                         graphics::par(mar = c(3, 3, 2, 1))
                         graphics::image(
                                 t(signal),
@@ -625,9 +623,8 @@ svaplot <- function(list,
                                 at = seq(0, 1, 1 / (ncol(
                                         signal
                                 ) - 1)),
-                                labels = colnames(signal),
-                                cex.axis = 0.618,
-                                las = 2
+                                labels = levels(lv),
+                                cex.axis = 0.8
                         )
                         graphics::par(mar = c(3, 3, 2, 1))
                         graphics::image(
@@ -644,9 +641,8 @@ svaplot <- function(list,
                                 at = seq(0, 1, 1 / (ncol(
                                         error
                                 ) - 1)),
-                                labels = colnames(error),
-                                cex.axis = 0.618,
-                                las = 2
+                                labels = levels(lv),
+                                cex.axis = 0.8
                         )
 
                         breaks <-
@@ -690,8 +686,8 @@ svaplot <- function(list,
                 if (pqvalues == "anova" & sum(pValues < pt & qValues < qt) != 0) {
                         message('Have SVs while p-values and q-values have results')
                         graphics::layout(matrix(rep(
-                                c(1, 1, 2, 2, 3, 3, 4, 4, 5), 9
-                        ), 9, 9, byrow = TRUE))
+                                c(1, 1, 2, 2, 3, 3, 4), 7
+                        ), 7, 7, byrow = TRUE))
                         graphics::par(mar = c(3, 5, 1, 1))
                         data <- data[pValues < pt & qValues < qt,]
                         signal <-
@@ -713,12 +709,8 @@ svaplot <- function(list,
                         )
                         graphics::axis(
                                 1,
-                                at = seq(0, 1, 1 / (ncol(
-                                        data
-                                ) - 1)),
-                                labels = colnames(data),
-                                cex.axis = 0.618,
-                                las = 2
+                                at = pos,
+                                labels = levels(lv)
                         )
                         graphics::axis(
                                 2,
@@ -726,9 +718,9 @@ svaplot <- function(list,
                                         data
                                 ) - 1)),
                                 labels = rownames(data),
-                                cex.axis = 0.618,
                                 las = 2
                         )
+                        abline(v = posv)
 
                         graphics::image(
                                 t(signal),
@@ -741,12 +733,8 @@ svaplot <- function(list,
                         )
                         graphics::axis(
                                 1,
-                                at = seq(0, 1, 1 / (ncol(
-                                        signal
-                                ) - 1)),
-                                labels = colnames(signal),
-                                cex.axis = 0.618,
-                                las = 2
+                                at = pos,
+                                labels = levels(lv)
                         )
                         graphics::axis(
                                 2,
@@ -754,9 +742,9 @@ svaplot <- function(list,
                                         signal
                                 ) - 1)),
                                 labels = rownames(signal),
-                                cex.axis = 0.618,
                                 las = 2
                         )
+                        abline(v = posv)
 
                         graphics::image(
                                 t(error),
@@ -769,12 +757,8 @@ svaplot <- function(list,
                         )
                         graphics::axis(
                                 1,
-                                at = seq(0, 1, 1 / (ncol(
-                                        error
-                                ) - 1)),
-                                labels = colnames(error),
-                                cex.axis = 0.618,
-                                las = 2
+                                at = pos,
+                                labels = levels(lv)
                         )
                         graphics::axis(
                                 2,
@@ -782,9 +766,9 @@ svaplot <- function(list,
                                         error
                                 ) - 1)),
                                 labels = rownames(error),
-                                cex.axis = 0.618,
                                 las = 2
                         )
+                        abline(v = posv)
 
                         breaks <-
                                 seq(zlim[1], zlim[2], round((zlim[2] - zlim[1]) / 10))
@@ -846,12 +830,8 @@ svaplot <- function(list,
                         )
                         graphics::axis(
                                 1,
-                                at = seq(0, 1, 1 / (ncol(
-                                        data
-                                ) - 1)),
-                                labels = colnames(data),
-                                cex.axis = 0.618,
-                                las = 2
+                                at = pos,
+                                labels = levels(lv)
                         )
                         graphics::axis(
                                 2,
@@ -859,9 +839,9 @@ svaplot <- function(list,
                                         data
                                 ) - 1)),
                                 labels = rownames(data),
-                                cex.axis = 0.618,
                                 las = 2
                         )
+                        abline(v = posv)
                         graphics::par(mar = c(3, 3, 2, 1))
                         graphics::image(
                                 t(signal2),
@@ -874,13 +854,10 @@ svaplot <- function(list,
                         )
                         graphics::axis(
                                 1,
-                                at = seq(0, 1, 1 / (
-                                        ncol(signal2) - 1
-                                )),
-                                labels = colnames(signal2),
-                                cex.axis = 0.618,
-                                las = 2
+                                at = pos,
+                                labels = levels(lv)
                         )
+                        abline(v = posv)
                         graphics::par(mar = c(3, 3, 2, 1))
                         graphics::image(
                                 t(error2),
@@ -893,13 +870,10 @@ svaplot <- function(list,
                         )
                         graphics::axis(
                                 1,
-                                at = seq(0, 1, 1 / (ncol(
-                                        error2
-                                ) - 1)),
-                                labels = colnames(error2),
-                                cex.axis = 0.618,
-                                las = 2
+                                at = pos,
+                                labels = levels(lv)
                         )
+                        abline(v = posv)
 
                         breaks <-
                                 seq(zlim[1], zlim[2], round((zlim[2] - zlim[1]) / 10))
@@ -945,7 +919,7 @@ svaplot <- function(list,
                         graphics::layout(matrix(rep(
                                 c(1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6), 11
                         ), 11, 11, byrow = TRUE))
-                        graphics::par(mar = c(3, 4, 2, 1))
+                        graphics::par(mar = c(3, 5, 2, 1))
                         data <-
                                 data[pValuesSv < pt &
                                              qValuesSv < qt,]
@@ -974,12 +948,8 @@ svaplot <- function(list,
                         )
                         graphics::axis(
                                 1,
-                                at = seq(0, 1, 1 / (ncol(
-                                        data
-                                ) - 1)),
-                                labels = colnames(data),
-                                cex.axis = 0.618,
-                                las = 2
+                                at = pos,
+                                labels = levels(lv)
                         )
                         graphics::axis(
                                 2,
@@ -987,9 +957,9 @@ svaplot <- function(list,
                                         data
                                 ) - 1)),
                                 labels = rownames(data),
-                                cex.axis = 0.618,
                                 las = 1
                         )
+                        abline(v = posv)
 
                         graphics::image(
                                 t(signal),
@@ -1002,12 +972,9 @@ svaplot <- function(list,
                         )
                         graphics::axis(
                                 1,
-                                at = seq(0, 1, 1 / (ncol(
-                                        signal
-                                ) - 1)),
-                                labels = colnames(signal),
-                                cex.axis = 0.618,
-                                las = 2
+                                at = pos,
+                                labels = levels(lv),
+                                cex.axis = 0.8
                         )
                         graphics::axis(
                                 2,
@@ -1015,9 +982,9 @@ svaplot <- function(list,
                                         signal
                                 ) - 1)),
                                 labels = rownames(signal),
-                                cex.axis = 0.618,
                                 las = 1
                         )
+                        abline(v = posv)
 
                         graphics::image(
                                 t(batch),
@@ -1030,12 +997,8 @@ svaplot <- function(list,
                         )
                         graphics::axis(
                                 1,
-                                at = seq(0, 1, 1 / (ncol(
-                                        batch
-                                ) - 1)),
-                                labels = colnames(batch),
-                                cex.axis = 0.618,
-                                las = 2
+                                at = pos,
+                                labels = levels(lv)
                         )
                         graphics::axis(
                                 2,
@@ -1043,9 +1006,9 @@ svaplot <- function(list,
                                         batch
                                 ) - 1)),
                                 labels = rownames(batch),
-                                cex.axis = 0.618,
                                 las = 1
                         )
+                        abline(v = posv)
 
                         graphics::image(
                                 t(error),
@@ -1058,12 +1021,8 @@ svaplot <- function(list,
                         )
                         graphics::axis(
                                 1,
-                                at = seq(0, 1, 1 / (ncol(
-                                        error
-                                ) - 1)),
-                                labels = colnames(error),
-                                cex.axis = 0.618,
-                                las = 2
+                                at = pos,
+                                labels = levels(lv)
                         )
                         graphics::axis(
                                 2,
@@ -1071,9 +1030,9 @@ svaplot <- function(list,
                                         error
                                 ) - 1)),
                                 labels = rownames(error),
-                                cex.axis = 0.618,
                                 las = 1
                         )
+                        abline(v = posv)
 
                         graphics::image(
                                 t(datacor),
@@ -1086,12 +1045,8 @@ svaplot <- function(list,
                         )
                         graphics::axis(
                                 1,
-                                at = seq(0, 1, 1 / (
-                                        ncol(datacor) - 1
-                                )),
-                                labels = colnames(datacor),
-                                cex.axis = 0.618,
-                                las = 2
+                                at = pos,
+                                labels = levels(lv)
                         )
                         graphics::axis(
                                 2,
@@ -1099,9 +1054,9 @@ svaplot <- function(list,
                                         nrow(datacor) - 1
                                 )),
                                 labels = rownames(datacor),
-                                cex.axis = 0.618,
                                 las = 1
                         )
+                        abline(v = posv)
 
                         breaks <-
                                 seq(zlim[1], zlim[2], round((zlim[2] - zlim[1]) / 10))
@@ -1168,12 +1123,8 @@ svaplot <- function(list,
                         )
                         graphics::axis(
                                 1,
-                                at = seq(0, 1, 1 / (ncol(
-                                        data
-                                ) - 1)),
-                                labels = colnames(data),
-                                cex.axis = 0.618,
-                                las = 2
+                                at = pos,
+                                labels = levels(lv)
                         )
                         graphics::axis(
                                 2,
@@ -1181,10 +1132,10 @@ svaplot <- function(list,
                                         data
                                 ) - 1)),
                                 labels = rownames(data),
-                                cex.axis = 0.618,
                                 las = 2
                         )
-                        graphics::par(mar = c(3, 3, 2, 1))
+                        abline(v = posv)
+                        graphics::par(mar = c(3, 5, 2, 1))
                         graphics::image(
                                 t(signal),
                                 col = icolors,
@@ -1196,14 +1147,11 @@ svaplot <- function(list,
                         )
                         graphics::axis(
                                 1,
-                                at = seq(0, 1, 1 / (ncol(
-                                        signal
-                                ) - 1)),
-                                labels = colnames(signal),
-                                cex.axis = 0.618,
-                                las = 2
+                                at = pos,
+                                labels = levels(lv)
                         )
-                        graphics::par(mar = c(3, 3, 2, 1))
+                        abline(v = posv)
+                        graphics::par(mar = c(3, 5, 2, 1))
                         graphics::image(
                                 t(batch),
                                 col = icolors,
@@ -1215,13 +1163,10 @@ svaplot <- function(list,
                         )
                         graphics::axis(
                                 1,
-                                at = seq(0, 1, 1 / (ncol(
-                                        batch
-                                ) - 1)),
-                                labels = colnames(batch),
-                                cex.axis = 0.618,
-                                las = 2
+                                at = pos,
+                                labels = levels(lv)
                         )
+                        abline(v = posv)
                         graphics::par(mar = c(3, 3, 2, 1))
                         graphics::image(
                                 t(error),
@@ -1234,12 +1179,8 @@ svaplot <- function(list,
                         )
                         graphics::axis(
                                 1,
-                                at = seq(0, 1, 1 / (ncol(
-                                        error
-                                ) - 1)),
-                                labels = colnames(error),
-                                cex.axis = 0.618,
-                                las = 2
+                                at = pos,
+                                labels = levels(lv)
                         )
                         graphics::par(mar = c(3, 6, 2, 3))
                         graphics::image(
@@ -1253,13 +1194,10 @@ svaplot <- function(list,
                         )
                         graphics::axis(
                                 1,
-                                at = seq(0, 1, 1 / (
-                                        ncol(datacor) - 1
-                                )),
-                                labels = colnames(datacor),
-                                cex.axis = 0.618,
-                                las = 2
+                                at = pos,
+                                labels = levels(lv)
                         )
+                        abline(v = posv)
 
                         breaks <-
                                 seq(zlim[1], zlim[2], round((zlim[2] - zlim[1]) / 10))

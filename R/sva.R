@@ -420,7 +420,9 @@ svaplot <- function(list,
                     pqvalues = "sv",
                     pt = 0.05,
                     qt = 0.05,
-                    lv = NULL) {
+                    lv = NULL,
+                    index = NULL
+                    ) {
         data <- list$data
         signal <- list$signal
         signal2 <- list$signal2
@@ -432,6 +434,20 @@ svaplot <- function(list,
         qValues <- list$'q-values'
         pValuesSv <- list$'p-valuesCorrected'
         qValuesSv <- list$'q-valuesCorrected'
+        if(!is.null(index)){
+                data <- data[index,]
+                signal <- signal[index,]
+                signal2 <- signal2[index,]
+                batch <- batch[index,]
+                error <- error[index,]
+                error2 <- error2[index,]
+                datacor <- datacor[index,]
+                pValues <- pValues[index]
+                qValues <- qValues[index]
+                pValuesSv <- pValuesSv[index]
+                qValuesSv <- qValuesSv[index]
+        }
+
         if(is.null(lv)){
                 lv <- as.factor(colnames(data))
         }
@@ -441,134 +457,269 @@ svaplot <- function(list,
         icolors <-
                 grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(11, "RdYlBu")))(100)
 
+        plotchange <- function(zlim){
+                breaks <-
+                        seq(zlim[1], zlim[2], round((zlim[2] - zlim[1]) / 10))
+                poly <-
+                        vector(mode = "list", length(icolors))
+                graphics::plot(
+                        1,
+                        1,
+                        t = "n",
+                        xlim = c(0, 1),
+                        ylim = zlim,
+                        xaxt = 'n',
+                        yaxt = 'n',
+                        xaxs = "i",
+                        yaxs = "i",
+                        ylab = '',
+                        xlab = '',
+                        frame.plot = F
+                )
+                graphics::axis(
+                        4,
+                        at = breaks,
+                        labels = round(breaks),
+                        las = 1,
+                        pos = 0.4,
+                        cex.axis=0.8
+                )
+                p <- graphics::par('usr')
+                graphics::text(p[2]+2, mean(p[3:4]), labels = 'intensity', xpd = NA, srt = -90)
+                bks <-
+                        seq(zlim[1], zlim[2], length.out = (length(icolors) + 1))
+                for (i in seq(poly)) {
+                        graphics::polygon(
+                                c(0.1, 0.1, 0.3, 0.3),
+                                c(bks[i], bks[i + 1], bks[i + 1], bks[i]),
+                                col = icolors[i],
+                                border = NA
+                        )
+                }
+        }
+        plotimage1 <- function(data, signal, error,zlim){
+                graphics::image(
+                        t(data),
+                        col = icolors,
+                        xlab = 'samples',
+                        main = 'peaks',
+                        xaxt = "n",
+                        yaxt = "n",
+                        zlim = zlim
+                )
+                graphics::axis(
+                        1,
+                        at = pos,
+                        labels = levels(lv),
+                        cex.axis = 0.8
+                )
+                graphics::axis(
+                        2,
+                        at = seq(0, 1, 1 / (nrow(
+                                data
+                        ) - 1)),
+                        labels = rownames(data),
+                        cex.axis = 1,
+                        las = 2
+                )
+                graphics::abline(v = posv)
+
+                graphics::image(
+                        t(signal),
+                        col = icolors,
+                        xlab = 'samples',
+                        main = 'peaks-signal',
+                        xaxt = "n",
+                        yaxt = "n",
+                        zlim = zlim
+                )
+                graphics::axis(
+                        1,
+                        at = pos,
+                        labels = levels(lv),
+                        cex.axis = 0.8
+                )
+                graphics::axis(
+                        2,
+                        at = seq(0, 1, 1 / (nrow(
+                                signal
+                        ) - 1)),
+                        labels = rownames(signal),
+                        cex.axis = 1,
+                        las = 2
+                )
+                graphics::abline(v = posv)
+
+                graphics::image(
+                        t(error),
+                        col = icolors,
+                        xlab = 'samples',
+                        main = 'peaks-error',
+                        xaxt = "n",
+                        yaxt = "n",
+                        zlim = zlim
+                )
+                graphics::axis(
+                        1,
+                        at = pos,
+                        labels = levels(lv),
+                        cex.axis = 0.8
+                )
+                graphics::axis(
+                        2,
+                        at = seq(0, 1, 1 / (nrow(
+                                error
+                        ) - 1)),
+                        labels = rownames(error),
+                        cex.axis = 1,
+                        las = 2
+                )
+                graphics::abline(v = posv)
+        }
+        plotimage2 <- function(data,signal,batch,error,datacor,zlim){
+
+                graphics::image(
+                        t(data),
+                        col = icolors,
+                        xlab = 'samples',
+                        main = 'peaks',
+                        xaxt = "n",
+                        yaxt = "n",
+                        zlim = zlim
+                )
+                graphics::axis(
+                        1,
+                        at = pos,
+                        labels = levels(lv)
+                )
+                graphics::axis(
+                        2,
+                        at = seq(0, 1, 1 / (nrow(
+                                data
+                        ) - 1)),
+                        labels = rownames(data),
+                        las = 1
+                )
+                graphics::abline(v = posv)
+
+                graphics::image(
+                        t(signal),
+                        col = icolors,
+                        xlab = 'samples',
+                        main = 'peaks-signal',
+                        xaxt = "n",
+                        yaxt = "n",
+                        zlim = zlim
+                )
+                graphics::axis(
+                        1,
+                        at = pos,
+                        labels = levels(lv),
+                        cex.axis = 1
+                )
+                graphics::axis(
+                        2,
+                        at = seq(0, 1, 1 / (nrow(
+                                signal
+                        ) - 1)),
+                        labels = rownames(signal),
+                        las = 1
+                )
+                graphics::abline(v = posv)
+
+                graphics::image(
+                        t(batch),
+                        col = icolors,
+                        xlab = 'samples',
+                        main = 'peaks-batch',
+                        xaxt = "n",
+                        yaxt = "n",
+                        zlim = zlim
+                )
+                graphics::axis(
+                        1,
+                        at = pos,
+                        labels = levels(lv)
+                )
+                graphics::axis(
+                        2,
+                        at = seq(0, 1, 1 / (nrow(
+                                batch
+                        ) - 1)),
+                        labels = rownames(batch),
+                        las = 1
+                )
+                graphics::abline(v = posv)
+
+                graphics::image(
+                        t(error),
+                        col = icolors,
+                        xlab = 'samples',
+                        main = 'peaks-error',
+                        xaxt = "n",
+                        yaxt = "n",
+                        zlim = zlim
+                )
+                graphics::axis(
+                        1,
+                        at = pos,
+                        labels = levels(lv)
+                )
+                graphics::axis(
+                        2,
+                        at = seq(0, 1, 1 / (nrow(
+                                error
+                        ) - 1)),
+                        labels = rownames(error),
+                        las = 1
+                )
+                graphics::abline(v = posv)
+
+                graphics::image(
+                        t(datacor),
+                        col = icolors,
+                        xlab = 'samples',
+                        main = 'peaks-corrected',
+                        xaxt = "n",
+                        yaxt = "n",
+                        zlim = zlim
+                )
+                graphics::axis(
+                        1,
+                        at = pos,
+                        labels = levels(lv)
+                )
+                graphics::axis(
+                        2,
+                        at = seq(0, 1, 1 / (
+                                nrow(datacor) - 1
+                        )),
+                        labels = rownames(datacor),
+                        las = 1
+                )
+                graphics::abline(v = posv)
+
+        }
+
         if (is.null(signal2)) {
                 if (pqvalues == "anova" & sum(pValues < pt & qValues < qt) != 0) {
                         message('No SV while p-values and q-values have results')
                         graphics::layout(matrix(rep(
                                 c(1, 1, 2, 2, 3, 3, 4, 4, 5), 9
                         ), 9, 9, byrow = TRUE))
-                        graphics::par(mar = c(3, 5, 1, 1))
                         data <- data[pValues < pt & qValues < qt,]
                         signal <-
                                 signal[pValues < pt &
                                                qValues < qt,]
                         error <-
                                 error[pValues < pt & qValues < qt,]
+
                         zlim <- range(c(data, signal, error))
+                        graphics::par(mar = c(3, 6, 2, 1))
+                        plotimage1(data,signal,error,zlim)
+                        graphics::par(mar = c(3, 1, 2, 6))
+                        plotchange(zlim)
 
-                        graphics::image(
-                                t(data),
-                                col = icolors,
-                                xlab = 'samples',
-                                main = 'peaks',
-                                xaxt = "n",
-                                yaxt = "n",
-                                zlim = zlim
-                        )
-                        graphics::axis(
-                                1,
-                                at = pos,
-                                labels = levels(lv),
-                                cex.axis = 0.8
-                        )
-                        graphics::axis(
-                                2,
-                                at = seq(0, 1, 1 / (nrow(
-                                        data
-                                ) - 1)),
-                                labels = rownames(data),
-                                cex.axis = 1,
-                                las = 2
-                        )
-                        abline(v = posv)
-
-                        graphics::image(
-                                t(signal),
-                                col = icolors,
-                                xlab = 'samples',
-                                main = 'peaks-signal',
-                                xaxt = "n",
-                                yaxt = "n",
-                                zlim = zlim
-                        )
-                        graphics::axis(
-                                1,
-                                at = pos,
-                                labels = levels(lv),
-                                cex.axis = 0.8
-                        )
-                        graphics::axis(
-                                2,
-                                at = seq(0, 1, 1 / (nrow(
-                                        signal
-                                ) - 1)),
-                                labels = rownames(signal),
-                                cex.axis = 1,
-                                las = 2
-                        )
-                        abline(v = posv)
-
-                        graphics::image(
-                                t(error),
-                                col = icolors,
-                                xlab = 'samples',
-                                main = 'peaks-error',
-                                xaxt = "n",
-                                yaxt = "n",
-                                zlim = zlim
-                        )
-                        graphics::axis(
-                                1,
-                                at = pos,
-                                labels = levels(lv),
-                                cex.axis = 0.8
-                        )
-                        graphics::axis(
-                                2,
-                                at = seq(0, 1, 1 / (nrow(
-                                        error
-                                ) - 1)),
-                                labels = rownames(error),
-                                cex.axis = 1,
-                                las = 2
-                        )
-                        abline(v = posv)
-
-                        breaks <-
-                                seq(zlim[1], zlim[2], round((zlim[2] - zlim[1]) / 10))
-                        poly <-
-                                vector(mode = "list", length(icolors))
-                        graphics::plot(
-                                1,
-                                1,
-                                t = "n",
-                                xlim = c(0, 1),
-                                ylim = zlim,
-                                xaxt = 'n',
-                                yaxt = 'n',
-                                xaxs = "i",
-                                yaxs = "i",
-                                ylab = '',
-                                xlab = 'intensity',
-                                frame.plot = F
-                        )
-                        graphics::axis(
-                                4,
-                                at = breaks,
-                                labels = round(breaks),
-                                las = 1,
-                                pos = 0.4
-                        )
-                        bks <-
-                                seq(zlim[1], zlim[2], length.out = (length(icolors) + 1))
-                        for (i in seq(poly)) {
-                                graphics::polygon(
-                                        c(0.1, 0.1, 0.3, 0.3),
-                                        c(bks[i], bks[i + 1], bks[i + 1], bks[i]),
-                                        col = icolors[i],
-                                        border = NA
-                                )
-                        }
                         li <-
                                 list(data, pValues < pt &
                                              qValues < qt)
@@ -580,107 +731,11 @@ svaplot <- function(list,
                         graphics::layout(matrix(rep(
                                 c(1, 1, 1, 2, 2, 3, 3, 4), 8
                         ), 8, 8, byrow = TRUE))
-                        graphics::par(mar = c(3, 6, 2, 3))
                         zlim <- range(c(data, signal, error))
-
-                        graphics::image(
-                                t(data),
-                                col = icolors,
-                                xlab = 'samples',
-                                main = 'peaks',
-                                xaxt = "n",
-                                yaxt = "n",
-                                zlim = zlim
-                        )
-                        graphics::axis(
-                                1,
-                                at = pos,
-                                labels = levels(lv),
-                                cex.axis = 0.8
-                        )
-                        graphics::axis(
-                                2,
-                                at = seq(0, 1, 1 / (nrow(
-                                        data
-                                ) - 1)),
-                                labels = rownames(data),
-                                cex.axis = 1,
-                                las = 2
-                        )
-                        abline(v = posv)
-                        graphics::par(mar = c(3, 3, 2, 1))
-                        graphics::image(
-                                t(signal),
-                                col = icolors,
-                                xlab = 'samples',
-                                main = 'peaks-signal',
-                                xaxt = "n",
-                                yaxt = "n",
-                                zlim = zlim
-                        )
-                        graphics::axis(
-                                1,
-                                at = seq(0, 1, 1 / (ncol(
-                                        signal
-                                ) - 1)),
-                                labels = levels(lv),
-                                cex.axis = 0.8
-                        )
-                        graphics::par(mar = c(3, 3, 2, 1))
-                        graphics::image(
-                                t(error),
-                                col = icolors,
-                                xlab = 'samples',
-                                main = 'peaks-error',
-                                xaxt = "n",
-                                yaxt = "n",
-                                zlim = zlim
-                        )
-                        graphics::axis(
-                                1,
-                                at = seq(0, 1, 1 / (ncol(
-                                        error
-                                ) - 1)),
-                                labels = levels(lv),
-                                cex.axis = 0.8
-                        )
-
-                        breaks <-
-                                seq(zlim[1], zlim[2], round((zlim[2] - zlim[1]) / 10))
-                        poly <-
-                                vector(mode = "list", length(icolors))
-                        graphics::par(mar = c(3, 0, 2, 3))
-                        graphics::plot(
-                                1,
-                                1,
-                                t = "n",
-                                xlim = c(0, 1),
-                                ylim = zlim,
-                                xaxt = 'n',
-                                yaxt = 'n',
-                                xaxs = "i",
-                                yaxs = "i",
-                                ylab = '',
-                                xlab = 'intensity',
-                                frame.plot = F
-                        )
-                        graphics::axis(
-                                4,
-                                at = breaks,
-                                labels = round(breaks),
-                                las = 1,
-                                pos = 0.4
-                        )
-                        bks <-
-                                seq(zlim[1], zlim[2], length.out = (length(icolors) + 1))
-                        for (i in seq(poly)) {
-                                graphics::polygon(
-                                        c(0.1, 0.1, 0.3, 0.3),
-                                        c(bks[i], bks[i + 1], bks[i + 1], bks[i]),
-                                        col = icolors[i],
-                                        border = NA
-                                )
-                        }
+                        graphics::par(mar = c(3, 6, 2, 1))
+                        plotimage1(data,signal,error,zlim)
+                        graphics::par(mar = c(3, 1, 2, 6))
+                        plotchange(zlim)
                 }
         } else{
                 if (pqvalues == "anova" & sum(pValues < pt & qValues < qt) != 0) {
@@ -688,7 +743,6 @@ svaplot <- function(list,
                         graphics::layout(matrix(rep(
                                 c(1, 1, 2, 2, 3, 3, 4), 7
                         ), 7, 7, byrow = TRUE))
-                        graphics::par(mar = c(3, 5, 1, 1))
                         data <- data[pValues < pt & qValues < qt,]
                         signal <-
                                 signal2[pValues < pt &
@@ -698,113 +752,10 @@ svaplot <- function(list,
                                                qValues < qt,]
                         zlim <- range(c(data, signal, error))
 
-                        graphics::image(
-                                t(data),
-                                col = icolors,
-                                xlab = 'samples',
-                                main = 'peaks',
-                                xaxt = "n",
-                                yaxt = "n",
-                                zlim = zlim
-                        )
-                        graphics::axis(
-                                1,
-                                at = pos,
-                                labels = levels(lv)
-                        )
-                        graphics::axis(
-                                2,
-                                at = seq(0, 1, 1 / (nrow(
-                                        data
-                                ) - 1)),
-                                labels = rownames(data),
-                                las = 2
-                        )
-                        abline(v = posv)
-
-                        graphics::image(
-                                t(signal),
-                                col = icolors,
-                                xlab = 'samples',
-                                main = 'peaks-signal',
-                                xaxt = "n",
-                                yaxt = "n",
-                                zlim = zlim
-                        )
-                        graphics::axis(
-                                1,
-                                at = pos,
-                                labels = levels(lv)
-                        )
-                        graphics::axis(
-                                2,
-                                at = seq(0, 1, 1 / (nrow(
-                                        signal
-                                ) - 1)),
-                                labels = rownames(signal),
-                                las = 2
-                        )
-                        abline(v = posv)
-
-                        graphics::image(
-                                t(error),
-                                col = icolors,
-                                xlab = 'samples',
-                                main = 'peaks-error',
-                                xaxt = "n",
-                                yaxt = "n",
-                                zlim = zlim
-                        )
-                        graphics::axis(
-                                1,
-                                at = pos,
-                                labels = levels(lv)
-                        )
-                        graphics::axis(
-                                2,
-                                at = seq(0, 1, 1 / (nrow(
-                                        error
-                                ) - 1)),
-                                labels = rownames(error),
-                                las = 2
-                        )
-                        abline(v = posv)
-
-                        breaks <-
-                                seq(zlim[1], zlim[2], round((zlim[2] - zlim[1]) / 10))
-                        poly <-
-                                vector(mode = "list", length(icolors))
-                        graphics::plot(
-                                1,
-                                1,
-                                t = "n",
-                                xlim = c(0, 1),
-                                ylim = zlim,
-                                xaxt = 'n',
-                                yaxt = 'n',
-                                xaxs = "i",
-                                yaxs = "i",
-                                ylab = '',
-                                xlab = 'intensity',
-                                frame.plot = F
-                        )
-                        graphics::axis(
-                                4,
-                                at = breaks,
-                                labels = round(breaks),
-                                las = 1,
-                                pos = 0.4
-                        )
-                        bks <-
-                                seq(zlim[1], zlim[2], length.out = (length(icolors) + 1))
-                        for (i in seq(poly)) {
-                                graphics::polygon(
-                                        c(0.1, 0.1, 0.3, 0.3),
-                                        c(bks[i], bks[i + 1], bks[i + 1], bks[i]),
-                                        col = icolors[i],
-                                        border = NA
-                                )
-                        }
+                        graphics::par(mar = c(3, 6, 2, 1))
+                        plotimage1(data,signal,error,zlim)
+                        graphics::par(mar = c(3, 1, 2, 6))
+                        plotchange(zlim)
                         li <-
                                 list(data, pValues < pt &
                                              qValues < qt)
@@ -816,101 +767,12 @@ svaplot <- function(list,
                         graphics::layout(matrix(rep(
                                 c(1, 1, 1, 2, 2, 3, 3, 4), 8
                         ), 8, 8, byrow = TRUE))
-                        graphics::par(mar = c(3, 6, 2, 3))
                         zlim <- range(c(data, signal2, error2))
 
-                        graphics::image(
-                                t(data),
-                                col = icolors,
-                                xlab = 'samples',
-                                main = 'peaks',
-                                xaxt = "n",
-                                yaxt = "n",
-                                zlim = zlim
-                        )
-                        graphics::axis(
-                                1,
-                                at = pos,
-                                labels = levels(lv)
-                        )
-                        graphics::axis(
-                                2,
-                                at = seq(0, 1, 1 / (nrow(
-                                        data
-                                ) - 1)),
-                                labels = rownames(data),
-                                las = 2
-                        )
-                        abline(v = posv)
-                        graphics::par(mar = c(3, 3, 2, 1))
-                        graphics::image(
-                                t(signal2),
-                                col = icolors,
-                                xlab = 'samples',
-                                main = 'peaks-signal',
-                                xaxt = "n",
-                                yaxt = "n",
-                                zlim = zlim
-                        )
-                        graphics::axis(
-                                1,
-                                at = pos,
-                                labels = levels(lv)
-                        )
-                        abline(v = posv)
-                        graphics::par(mar = c(3, 3, 2, 1))
-                        graphics::image(
-                                t(error2),
-                                col = icolors,
-                                xlab = 'samples',
-                                main = 'peaks-error',
-                                xaxt = "n",
-                                yaxt = "n",
-                                zlim = zlim
-                        )
-                        graphics::axis(
-                                1,
-                                at = pos,
-                                labels = levels(lv)
-                        )
-                        abline(v = posv)
-
-                        breaks <-
-                                seq(zlim[1], zlim[2], round((zlim[2] - zlim[1]) / 10))
-                        poly <-
-                                vector(mode = "list", length(icolors))
-                        graphics::par(mar = c(3, 0, 2, 3))
-                        graphics::plot(
-                                1,
-                                1,
-                                t = "n",
-                                xlim = c(0, 1),
-                                ylim = zlim,
-                                xaxt = 'n',
-                                yaxt = 'n',
-                                xaxs = "i",
-                                yaxs = "i",
-                                ylab = '',
-                                xlab = 'intensity',
-                                frame.plot = F
-                        )
-                        graphics::axis(
-                                4,
-                                at = breaks,
-                                labels = round(breaks),
-                                las = 1,
-                                pos = 0.4
-                        )
-                        bks <-
-                                seq(zlim[1], zlim[2], length.out = (length(icolors) + 1))
-                        for (i in seq(poly)) {
-                                graphics::polygon(
-                                        c(0.1, 0.1, 0.3, 0.3),
-                                        c(bks[i], bks[i + 1], bks[i + 1], bks[i]),
-                                        col = icolors[i],
-                                        border = NA
-                                )
-                        }
+                        graphics::par(mar = c(3, 6, 2, 1))
+                        plotimage1(data,signal2,error2,zlim)
+                        graphics::par(mar = c(3, 1, 2, 6))
+                        plotchange(zlim)
                 }
                 else if (pqvalues == "sv" &
                          sum(pValuesSv < pt &
@@ -919,7 +781,6 @@ svaplot <- function(list,
                         graphics::layout(matrix(rep(
                                 c(1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6), 11
                         ), 11, 11, byrow = TRUE))
-                        graphics::par(mar = c(3, 5, 2, 1))
                         data <-
                                 data[pValuesSv < pt &
                                              qValuesSv < qt,]
@@ -936,164 +797,10 @@ svaplot <- function(list,
                                                 qValuesSv < qt,]
                         zlim <-
                                 range(c(data, signal, batch, error, datacor))
-
-                        graphics::image(
-                                t(data),
-                                col = icolors,
-                                xlab = 'samples',
-                                main = 'peaks',
-                                xaxt = "n",
-                                yaxt = "n",
-                                zlim = zlim
-                        )
-                        graphics::axis(
-                                1,
-                                at = pos,
-                                labels = levels(lv)
-                        )
-                        graphics::axis(
-                                2,
-                                at = seq(0, 1, 1 / (nrow(
-                                        data
-                                ) - 1)),
-                                labels = rownames(data),
-                                las = 1
-                        )
-                        abline(v = posv)
-
-                        graphics::image(
-                                t(signal),
-                                col = icolors,
-                                xlab = 'samples',
-                                main = 'peaks-signal',
-                                xaxt = "n",
-                                yaxt = "n",
-                                zlim = zlim
-                        )
-                        graphics::axis(
-                                1,
-                                at = pos,
-                                labels = levels(lv),
-                                cex.axis = 0.8
-                        )
-                        graphics::axis(
-                                2,
-                                at = seq(0, 1, 1 / (nrow(
-                                        signal
-                                ) - 1)),
-                                labels = rownames(signal),
-                                las = 1
-                        )
-                        abline(v = posv)
-
-                        graphics::image(
-                                t(batch),
-                                col = icolors,
-                                xlab = 'samples',
-                                main = 'peaks-batch',
-                                xaxt = "n",
-                                yaxt = "n",
-                                zlim = zlim
-                        )
-                        graphics::axis(
-                                1,
-                                at = pos,
-                                labels = levels(lv)
-                        )
-                        graphics::axis(
-                                2,
-                                at = seq(0, 1, 1 / (nrow(
-                                        batch
-                                ) - 1)),
-                                labels = rownames(batch),
-                                las = 1
-                        )
-                        abline(v = posv)
-
-                        graphics::image(
-                                t(error),
-                                col = icolors,
-                                xlab = 'samples',
-                                main = 'peaks-error',
-                                xaxt = "n",
-                                yaxt = "n",
-                                zlim = zlim
-                        )
-                        graphics::axis(
-                                1,
-                                at = pos,
-                                labels = levels(lv)
-                        )
-                        graphics::axis(
-                                2,
-                                at = seq(0, 1, 1 / (nrow(
-                                        error
-                                ) - 1)),
-                                labels = rownames(error),
-                                las = 1
-                        )
-                        abline(v = posv)
-
-                        graphics::image(
-                                t(datacor),
-                                col = icolors,
-                                xlab = 'samples',
-                                main = 'peaks-corrected',
-                                xaxt = "n",
-                                yaxt = "n",
-                                zlim = zlim
-                        )
-                        graphics::axis(
-                                1,
-                                at = pos,
-                                labels = levels(lv)
-                        )
-                        graphics::axis(
-                                2,
-                                at = seq(0, 1, 1 / (
-                                        nrow(datacor) - 1
-                                )),
-                                labels = rownames(datacor),
-                                las = 1
-                        )
-                        abline(v = posv)
-
-                        breaks <-
-                                seq(zlim[1], zlim[2], round((zlim[2] - zlim[1]) / 10))
-                        poly <-
-                                vector(mode = "list", length(icolors))
-                        graphics::par(mar = c(3, 0, 2, 3))
-                        graphics::plot(
-                                1,
-                                1,
-                                t = "n",
-                                xlim = c(0, 1),
-                                ylim = zlim,
-                                xaxt = 'n',
-                                yaxt = 'n',
-                                xaxs = "i",
-                                yaxs = "i",
-                                ylab = '',
-                                xlab = 'intensity',
-                                frame.plot = F
-                        )
-                        graphics::axis(
-                                4,
-                                at = breaks,
-                                labels = round(breaks),
-                                las = 1,
-                                pos = 0.4
-                        )
-                        bks <-
-                                seq(zlim[1], zlim[2], length.out = (length(icolors) + 1))
-                        for (i in seq(poly)) {
-                                graphics::polygon(
-                                        c(0.1, 0.1, 0.3, 0.3),
-                                        c(bks[i], bks[i + 1], bks[i + 1], bks[i]),
-                                        col = icolors[i],
-                                        border = NA
-                                )
-                        }
+                        graphics::par(mar = c(3, 6, 2, 1))
+                        plotimage2(data,signal,batch,error,datacor,zlim)
+                        graphics::par(mar = c(3, 1, 2, 5))
+                        plotchange(zlim)
                         li <-
                                 list(datacor,
                                      data,
@@ -1108,133 +815,12 @@ svaplot <- function(list,
                         graphics::layout(matrix(rep(
                                 c(1, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 5, 6), 13
                         ), 13, 13, byrow = TRUE))
-                        graphics::par(mar = c(3, 6, 2, 3))
                         zlim <-
                                 range(c(signal, data, batch, error, datacor))
-
-                        graphics::image(
-                                t(data),
-                                col = icolors,
-                                xlab = 'samples',
-                                main = 'peaks',
-                                xaxt = "n",
-                                yaxt = "n",
-                                zlim = zlim
-                        )
-                        graphics::axis(
-                                1,
-                                at = pos,
-                                labels = levels(lv)
-                        )
-                        graphics::axis(
-                                2,
-                                at = seq(0, 1, 1 / (nrow(
-                                        data
-                                ) - 1)),
-                                labels = rownames(data),
-                                las = 2
-                        )
-                        abline(v = posv)
-                        graphics::par(mar = c(3, 5, 2, 1))
-                        graphics::image(
-                                t(signal),
-                                col = icolors,
-                                xlab = 'samples',
-                                main = 'peaks-signal',
-                                xaxt = "n",
-                                yaxt = "n",
-                                zlim = zlim
-                        )
-                        graphics::axis(
-                                1,
-                                at = pos,
-                                labels = levels(lv)
-                        )
-                        abline(v = posv)
-                        graphics::par(mar = c(3, 5, 2, 1))
-                        graphics::image(
-                                t(batch),
-                                col = icolors,
-                                xlab = 'samples',
-                                main = 'peaks-batch',
-                                xaxt = "n",
-                                yaxt = "n",
-                                zlim = zlim
-                        )
-                        graphics::axis(
-                                1,
-                                at = pos,
-                                labels = levels(lv)
-                        )
-                        abline(v = posv)
-                        graphics::par(mar = c(3, 3, 2, 1))
-                        graphics::image(
-                                t(error),
-                                col = icolors,
-                                xlab = 'samples',
-                                main = 'peaks-error',
-                                xaxt = "n",
-                                yaxt = "n",
-                                zlim = zlim
-                        )
-                        graphics::axis(
-                                1,
-                                at = pos,
-                                labels = levels(lv)
-                        )
-                        graphics::par(mar = c(3, 6, 2, 3))
-                        graphics::image(
-                                t(datacor),
-                                col = icolors,
-                                xlab = 'samples',
-                                main = 'peaks-corrected',
-                                xaxt = "n",
-                                yaxt = "n",
-                                zlim = zlim
-                        )
-                        graphics::axis(
-                                1,
-                                at = pos,
-                                labels = levels(lv)
-                        )
-                        abline(v = posv)
-
-                        breaks <-
-                                seq(zlim[1], zlim[2], round((zlim[2] - zlim[1]) / 10))
-                        poly <-
-                                vector(mode = "list", length(icolors))
-                        graphics::par(mar = c(3, 0, 2, 3))
-                        graphics::plot(
-                                1,
-                                1,
-                                t = "n",
-                                xlim = c(0, 1),
-                                ylim = zlim,
-                                xaxt = 'n',
-                                yaxt = 'n',
-                                xaxs = "i",
-                                yaxs = "i",
-                                ylab = '',
-                                xlab = 'intensity',
-                                frame.plot = F
-                        )
-                        graphics::axis(
-                                4,
-                                at = breaks,
-                                labels = round(breaks),
-                                las = 1,
-                                pos = 0.4
-                        )
-                        bks <-
-                                seq(zlim[1], zlim[2], length.out = (length(icolors) + 1))
-                        for (i in seq(poly)) {
-                                graphics::polygon(
-                                        c(0.1, 0.1, 0.3, 0.3),
-                                        c(bks[i], bks[i + 1], bks[i + 1], bks[i]),
-                                        col = icolors[i],
-                                        border = NA
-                                )
-                        }
+                        graphics::par(mar = c(3, 6, 2, 1))
+                        plotimage2(data,signal,batch,error,datacor,zlim)
+                        graphics::par(mar = c(3, 1, 2, 6))
+                        plotchange(zlim)
                 }
         }
 }

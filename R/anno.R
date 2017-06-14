@@ -127,7 +127,8 @@ fanno <-
                                         HMDBselect = "union",
                                         mass_defect_window = 0.01,
                                         pathwaycheckmode = "pm",
-                                        mass_defect_mode = mode
+                                        mass_defect_mode = mode,
+                                        ...
                                 )
                 }else{
                         annotres <-
@@ -161,7 +162,8 @@ fanno <-
                                         HMDBselect = "union",
                                         mass_defect_window = 0.01,
                                         pathwaycheckmode = "pm",
-                                        mass_defect_mode = mode
+                                        mass_defect_mode = mode,
+                                        ...
                                 )
                 }
                 return(annotres)
@@ -274,6 +276,7 @@ svaanno <-
 #' @param mode defalut is for positive mode, otherwise use 'neg' for negative
 #' @param list adductlist for annotation. the default adductlist is queryadductlist=c("M+2H","M+H+NH4","M+ACN+2H","M+2ACN+2H","M+H","M+NH4","M+Na","M+ACN+H","M+ACN+Na","M+2ACN+H","2M+H","2M+Na","2M+ACN+H","M+2Na-H","M+H-H2O","M+H-2H2O") . You might use other options for negative mode: c("M-H","M-H2O-H","M+Na-2H","M+Cl","M+FA-H"); c("positive"); c("negative"); c("all");see data(adduct_table) for complete list
 #' @param db_name default is 'HMDB', other database options: 'KEGG', 'LipidMaps', 'T3DB'
+#' @param ... parameters for multilevelannotation function in xMSannotator
 #' @return as shown in xMSannotator package
 #' @references Uppal, K.; Walker, D. I.; Jones, D. P. Anal. Chem. 2017, 89 (2), 1063–1067.
 #' @export
@@ -298,7 +301,7 @@ svafanno <- function(raw,
                              "M+H-H2O",
                              "M+H-2H2O"
                      ),
-                     db_name = 'HMDB') {
+                     db_name = 'HMDB',...) {
         adduct_weights = cbind.data.frame(Adduct = c('M+H','M-H'),Weight = c(5,5))
         if (is.null(raw$dataCorrected)) {
                 data <- raw$data
@@ -341,7 +344,8 @@ svafanno <- function(raw,
                                 HMDBselect = "union",
                                 mass_defect_window = 0.01,
                                 pathwaycheckmode = "pm",
-                                mass_defect_mode = mode
+                                mass_defect_mode = mode,
+                                ...
                         )
         }else{
                 annotres <-
@@ -375,7 +379,8 @@ svafanno <- function(raw,
                                 HMDBselect = "union",
                                 mass_defect_window = 0.01,
                                 pathwaycheckmode = "pm",
-                                mass_defect_mode = mode
+                                mass_defect_mode = mode,
+                                ...
                         )
         }
         return(annotres)

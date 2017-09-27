@@ -4,10 +4,7 @@
 \alias{fanno}
 \title{Annotation with xMSannotator package}
 \usage{
-fanno(xset, outloc = "./result/", mode = "pos", list = c("M+2H",
-  "M+H+NH4", "M+ACN+2H", "M+2ACN+2H", "M+H", "M+NH4", "M+Na", "M+ACN+H",
-  "M+ACN+Na", "M+2ACN+H", "2M+H", "2M+Na", "2M+ACN+H", "M+2Na-H", "M+H-H2O",
-  "M+H-2H2O"), db_name = "HMDB", ...)
+fanno(xset, outloc = "./result/", mode = "pos", db_name = "HMDB", ...)
 }
 \arguments{
 \item{xset}{a xcmsset object to be annotated}
@@ -15,8 +12,6 @@ fanno(xset, outloc = "./result/", mode = "pos", list = c("M+2H",
 \item{outloc}{the path for your result}
 
 \item{mode}{defalut is for positive mode, otherwise use 'neg' for negative}
-
-\item{list}{adductlist for annotation. the default adductlist is queryadductlist=c("M+2H","M+H+NH4","M+ACN+2H","M+2ACN+2H","M+H","M+NH4","M+Na","M+ACN+H","M+ACN+Na","M+2ACN+H","2M+H","2M+Na","2M+ACN+H","M+2Na-H","M+H-H2O","M+H-2H2O") . You might use other options for negative mode: c("M-H","M-H2O-H","M+Na-2H","M+Cl","M+FA-H"); c("positive"); c("negative"); c("all");see data(adduct_table) for complete list}
 
 \item{db_name}{default is 'HMDB', other database options: 'KEGG', 'LipidMaps', 'T3DB'}
 

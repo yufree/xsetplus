@@ -69,7 +69,7 @@ fanno <-
         function(xset,
                  outloc = "./result/",
                  mode = 'pos',
-                 db_name = 'HMDB', ...) {
+                 db_name = 'HMDB', num_nodes = 10,...) {
                 data <- xcms::groupval(xset, 'medret', "into")
                 adduct_weights = cbind.data.frame(Adduct = c('M+H','M-H'),Weight = c(5,5))
                 mz <- xcms::groups(xset)[, 1]
@@ -86,6 +86,7 @@ fanno <-
                                         adduct_weights = adduct_weights,
                                         filter.by = c("M-H"),
                                         mass_defect_mode = mode,
+                                        num_nodes = num_nodes,
                                         ...
                                 )
                 }else{
@@ -98,6 +99,7 @@ fanno <-
                                         adduct_weights = adduct_weights,
                                         filter.by = c("M+H"),
                                         mass_defect_mode = mode,
+                                        num_nodes = num_nodes,
                                         ...
                                 )
                 }
@@ -217,7 +219,7 @@ svaanno <-
 svafanno <- function(raw,
                      outloc = "./result/",
                      mode = 'pos',
-                     db_name = 'HMDB',...) {
+                     db_name = 'HMDB',num_nodes = 10,...) {
         adduct_weights = cbind.data.frame(Adduct = c('M+H','M-H'),Weight = c(5,5))
         if (is.null(raw$dataCorrected)) {
                 data <- raw$data
@@ -238,6 +240,7 @@ svafanno <- function(raw,
                                 adduct_weights = adduct_weights,
                                 filter.by = c("M-H"),
                                 mass_defect_mode = mode,
+                                num_nodes = num_nodes,
                                 ...
                         )
         }else{
@@ -250,6 +253,7 @@ svafanno <- function(raw,
                                 adduct_weights = adduct_weights,
                                 filter.by = c("M+H"),
                                 mass_defect_mode = mode,
+                                num_nodes = num_nodes,
                                 ...
                         )
         }

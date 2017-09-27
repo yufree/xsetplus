@@ -4,7 +4,8 @@
 \alias{svafanno}
 \title{Annotation with xMSannotator package}
 \usage{
-svafanno(raw, outloc = "./result/", mode = "pos", db_name = "HMDB", ...)
+svafanno(raw, outloc = "./result/", mode = "pos", db_name = "HMDB",
+  num_nodes = 10, ...)
 }
 \arguments{
 \item{raw}{a xcmsset object to be annotated}

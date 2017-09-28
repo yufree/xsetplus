@@ -25,7 +25,12 @@ rtmzsim <- function(npeaks = 100, nbatch = 3, ncond = 2, npercond = 10,
         cmu <- seq(0, length.out = ncond, by = ccstep)
         bsize <- seq(basedisp, length.out = nbatch, by = bdispstep)
         ncol <- nbatch * ncond * npercond
+        batch <- rep(1:nbatch, each=ncond*npercond)
+        condition <- rep(rep(1:ncond, each=npercond), nbatch)
+        bc <- paste0('C',condition,'B',batch)
         A.matrix <- matrix(0, nrow = npeaks, ncol = ncol)
+        colnames(A.matrix) <- bc
+        rownames(A.matrix) <- paste0('P',c(1:length(npeaks)))
         samplewisevar <- swvar*rbeta(ncol,2,2)
         for (i in 1:npeaks) {
                 peaki <- c()

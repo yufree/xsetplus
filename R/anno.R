@@ -54,6 +54,7 @@ anno <- function(path, name, mode = NULL) {
 #' @param outloc the path for your result
 #' @param mode defalut is for positive mode, otherwise use 'neg' for negative
 #' @param db_name default is 'HMDB', other database options: 'KEGG', 'LipidMaps', 'T3DB'
+#' @param num_nodes default 10
 #' @param ... parameters for multilevelannotation function in xMSannotator
 #' @return as shown in xMSannotator package
 #' @references Uppal, K.; Walker, D. I.; Jones, D. P. Anal. Chem. 2017, 89 (2), 1063–1067.
@@ -212,6 +213,7 @@ svaanno <-
 #' @param outloc the path for your result
 #' @param mode defalut is for positive mode, otherwise use 'neg' for negative
 #' @param db_name default is 'HMDB', other database options: 'KEGG', 'LipidMaps', 'T3DB'
+#' @param num_nodes default 10
 #' @param ... parameters for multilevelannotation function in xMSannotator
 #' @return as shown in xMSannotator package
 #' @references Uppal, K.; Walker, D. I.; Jones, D. P. Anal. Chem. 2017, 89 (2), 1063–1067.

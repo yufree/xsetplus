@@ -30,7 +30,7 @@ rtmzsim <- function(npeaks = 100, nbatch = 3, ncond = 2, npercond = 10,
         bc <- paste0('C',condition,'B',batch)
         A.matrix <- matrix(0, nrow = npeaks, ncol = ncol)
         colnames(A.matrix) <- bc
-        rownames(A.matrix) <- paste0('P',c(1:length(npeaks)))
+        rownames(A.matrix) <- paste0('P',c(1:npeaks))
         samplewisevar <- swvar*rbeta(ncol,2,2)
         for (i in 1:npeaks) {
                 peaki <- c()

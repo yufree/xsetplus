@@ -1,6 +1,7 @@
 #' Generate simulated count data with batch effects for npeaks
 #'
-#' @param npeaks Number of genes to simulate
+#' @param npeaks Number of peaks to simulate
+#' @param nspeaks Number of significant peaks to simulate
 #' @param nbatch Number of batches to simulate
 #' @param ncond Number of conditions to simulate
 #' @param npercond Number of samples per condition per batch to simulate
@@ -16,7 +17,7 @@
 #' @export
 #' @examples
 #' rtmzsim()
-rtmzsim <- function(npeaks = 100, nbatch = 3, ncond = 2, npercond = 10,
+rtmzsim <- function(npeaks = 1000, nspeaks = 50, nbatch = 3, ncond = 2, npercond = 10,
                        basemean = 10000, ppstep = 50, bbstep = 2000, ccstep = 800,
                        basedisp = 100, bdispstep = 10, swvar = 1000, seed = 42) {
         set.seed(seed)
@@ -30,9 +31,9 @@ rtmzsim <- function(npeaks = 100, nbatch = 3, ncond = 2, npercond = 10,
         bc <- paste0('C',condition,'B',batch)
         A.matrix <- matrix(0, nrow = npeaks, ncol = ncol)
         colnames(A.matrix) <- bc
-        rownames(A.matrix) <- paste0('P',c(1:npeaks))
+
         samplewisevar <- swvar*rbeta(ncol,2,2)
-        for (i in 1:npeaks) {
+        for (i in 1:nspeaks) {
                 peaki <- c()
                 for (j in 1:nbatch) {
                         for (k in 1:ncond) {
@@ -44,5 +45,16 @@ rtmzsim <- function(npeaks = 100, nbatch = 3, ncond = 2, npercond = 10,
                 }
                 A.matrix[i, ] <- peaki
         }
+        for (i in 1:(npeaks-nspeaks)) {
+                peaki <- c()
+                for (j in 1:nbatch) {
+                                for (l in 1:npercond) {
+                                        peaki <- c(peaki, rnbinom(1, size = bsize[j],
+                                                                  mu = basemean+mu[i]+bmu[j]+samplewisevar[j*l]))
+                                }
+                        }
+                A.matrix[i, ] <- peaki
+        }
+        rownames(A.matrix) <- paste0('P',c(1:npeaks))
         return(A.matrix)
 }

@@ -4,12 +4,15 @@
 \alias{rtmzsim}
 \title{Generate simulated count data with batch effects for npeaks}
 \usage{
-rtmzsim(npeaks = 100, nbatch = 3, ncond = 2, npercond = 10,
-  basemean = 10000, ppstep = 50, bbstep = 2000, ccstep = 800,
-  basedisp = 100, bdispstep = 10, swvar = 1000, seed = 42)
+rtmzsim(npeaks = 1000, nspeaks = 50, nbatch = 3, ncond = 2,
+  npercond = 10, basemean = 10000, ppstep = 50, bbstep = 2000,
+  ccstep = 800, basedisp = 100, bdispstep = 10, swvar = 1000,
+  seed = 42)
 }
 \arguments{
-\item{npeaks}{Number of genes to simulate}
+\item{npeaks}{Number of peaks to simulate}
+
+\item{nspeaks}{Number of significant peaks to simulate}
 
 \item{nbatch}{Number of batches to simulate}
 

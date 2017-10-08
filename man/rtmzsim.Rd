@@ -4,44 +4,39 @@
 \alias{rtmzsim}
 \title{Generate simulated count data with batch effects for npeaks}
 \usage{
-rtmzsim(npeaks = 1000, nspeaks = 50, nbatch = 3, ncond = 2,
-  npercond = 10, basemean = 10000, ppstep = 50, bbstep = 2000,
-  ccstep = 800, basedisp = 100, bdispstep = 10, swvar = 1000,
-  seed = 42)
+rtmzsim(npeaks = 1000, ncond = 2, ncpeaks = 0.05, upc = 0.5,
+  nbatch = 3, nbpeaks = 0.1, upb = 0.3, npercond = 10, shape = 8,
+  scale = 12, seed = 42)
 }
 \arguments{
 \item{npeaks}{Number of peaks to simulate}
 
-\item{nspeaks}{Number of significant peaks to simulate}
+\item{ncond}{Number of conditions to simulate}
+
+\item{ncpeaks}{percentage of peaks influenced by conditions}
+
+\item{upc}{up regulation proportion in peaks influenced by conditions}
 
 \item{nbatch}{Number of batches to simulate}
 
-\item{ncond}{Number of conditions to simulate}
+\item{nbpeaks}{percentage of peaks influenced by batchs}
+
+\item{upb}{up regulation proportion in peaks influenced by batchs}
 
 \item{npercond}{Number of samples per condition per batch to simulate}
 
-\item{basemean}{Base mean}
+\item{shape}{shape for Weibull distribution}
 
-\item{ppstep}{peak to peak step variation}
-
-\item{bbstep}{Batch to Batch step variation}
-
-\item{ccstep}{Condition to Condition step variation}
-
-\item{basedisp}{Base Dispersion}
-
-\item{bdispstep}{Batch to Batch Dispersion step variation}
-
-\item{swvar}{Sample-wise extra variation}
+\item{scale}{scale for Weibull distribution}
 
 \item{seed}{Random seed for reproducibility}
 }
 \value{
-rtmz data matrix
+list with rtmz data matrix, row index of peaks influenced by conditions, row index of peaks influenced by batchs, column index of conditions, column of batchs, raw condition matrix, raw batch matrix
 }
 \description{
 Generate simulated count data with batch effects for npeaks
 }
 \examples{
-rtmzsim()
+sim <- rtmzsim()
 }

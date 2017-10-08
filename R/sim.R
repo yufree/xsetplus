@@ -1,60 +1,96 @@
 #' Generate simulated count data with batch effects for npeaks
 #'
 #' @param npeaks Number of peaks to simulate
-#' @param nspeaks Number of significant peaks to simulate
-#' @param nbatch Number of batches to simulate
 #' @param ncond Number of conditions to simulate
+#' @param ncpeaks percentage of peaks influenced by conditions
+#' @param upc up regulation proportion in peaks influenced by conditions
+#' @param nbatch Number of batches to simulate
+#' @param nbpeaks percentage of peaks influenced by batchs
+#' @param upb up regulation proportion in peaks influenced by batchs
 #' @param npercond Number of samples per condition per batch to simulate
-#' @param basemean Base mean
-#' @param ppstep peak to peak step variation
-#' @param bbstep Batch to Batch step variation
-#' @param ccstep Condition to Condition step variation
-#' @param basedisp Base Dispersion
-#' @param bdispstep Batch to Batch Dispersion step variation
-#' @param swvar Sample-wise extra variation
+#' @param shape shape for Weibull distribution
+#' @param scale scale for Weibull distribution
 #' @param seed Random seed for reproducibility
-#' @return rtmz data matrix
+#' @return list with rtmz data matrix, row index of peaks influenced by conditions, row index of peaks influenced by batchs, column index of conditions, column of batchs, raw condition matrix, raw batch matrix
 #' @export
 #' @examples
-#' rtmzsim()
-rtmzsim <- function(npeaks = 1000, nspeaks = 50, nbatch = 3, ncond = 2, npercond = 10,
-                       basemean = 10000, ppstep = 50, bbstep = 2000, ccstep = 800,
-                       basedisp = 100, bdispstep = 10, swvar = 1000, seed = 42) {
+#' sim <- rtmzsim()
+rtmzsim <- function(npeaks = 1000,
+                    ncond = 2,
+                    ncpeaks = 0.05,
+                    upc = 0.5,
+                    nbatch = 3,
+                    nbpeaks = 0.1,
+                    upb = 0.3,
+                    npercond = 10,
+                    shape = 8,
+                    scale = 12,
+                    seed = 42) {
         set.seed(seed)
-        mu <- seq(0, length.out = npeaks, by = ppstep)
-        bmu <- seq(0, length.out = nbatch, by = bbstep)
-        cmu <- seq(0, length.out = ncond, by = ccstep)
-        bsize <- seq(basedisp, length.out = nbatch, by = bdispstep)
         ncol <- nbatch * ncond * npercond
-        batch <- rep(1:nbatch, each=ncond*npercond)
-        condition <- rep(rep(1:ncond, each=npercond), nbatch)
-        bc <- paste0('C',condition,'B',batch)
-        A.matrix <- matrix(0, nrow = npeaks, ncol = ncol)
-        colnames(A.matrix) <- bc
+        batch <- rep(1:nbatch, each = ncond * npercond)
+        condition <- rep(rep(1:ncond, each = npercond), nbatch)
+        bc <- paste0('C', condition, 'B', batch)
+        matrix <- matrix(0, nrow = npeaks, ncol = ncol)
+        colnames(matrix) <- bc
 
-        samplewisevar <- swvar*rbeta(ncol,2,2)
-        for (i in 1:nspeaks) {
-                peaki <- c()
-                for (j in 1:nbatch) {
-                        for (k in 1:ncond) {
-                                for (l in 1:npercond) {
-                                        peaki <- c(peaki, rnbinom(1, size = bsize[j],
-                                                                  mu = basemean+mu[i]+bmu[j]+cmu[k]+samplewisevar[j*k*l]))
-                                }
-                        }
+        for (i in 1:ncol) {
+                sampleio <- exp(rweibull(npeaks, shape = shape, scale = scale))
+                samplei <- sampleio[order(sampleio)]
+                matrix[, i] <- samplei
+        }
+        # reorder the peaks
+        matrix0 <- matrix <- matrix[sample(nrow(matrix)), ]
+        # get the numbers of signal and batch peaks
+        ncpeaks <- npeaks * ncpeaks
+        nbpeaks <- npeaks * nbpeaks
+        # simulation of condition
+        index <- sample(1:npeaks, ncpeaks)
+        matrixc <- matrix[index, ]
+        for (i in 1:ncond) {
+                if (i != 1) {
+                        colindex <- condition == i
+                        flips <-
+                                rbinom(ncpeaks,
+                                       size = 1,
+                                       prob = upc)
+                        change <- runif(ncpeaks, 1, 10)
+                        flipschange <-
+                                ifelse(flips == 0, change, 1 / change)
+                        matrixc[, colindex] <-
+                                matrixc[, colindex] * flipschange
                 }
-                A.matrix[i, ] <- peaki
         }
-        for (i in 1:(npeaks-nspeaks)) {
-                peaki <- c()
-                for (j in 1:nbatch) {
-                                for (l in 1:npercond) {
-                                        peaki <- c(peaki, rnbinom(1, size = bsize[j],
-                                                                  mu = basemean+mu[i]+bmu[j]+samplewisevar[j*l]))
-                                }
-                        }
-                A.matrix[i, ] <- peaki
+        matrix[index, ] <- matrixc
+        # simulation of batch
+        indexb <- sample(1:npeaks, nbpeaks)
+        matrixb <- matrix[indexb, ]
+        matrixb0 <- matrix0[indexb,]
+        for (i in 1:nbatch) {
+                if (i != 1) {
+                        colindex <- batch == i
+                        flips <- rbinom(nbpeaks,
+                                        size = 1,
+                                        prob = upb)
+                        change <- runif(nbpeaks, 1, 10)
+                        flipschange <-
+                                ifelse(flips == 0, change, 1 / change)
+                        matrixb[, colindex] <-
+                                matrixb[, colindex] * flipschange
+                        matrixb0[, colindex] <-
+                                matrixb0[, colindex] * flipschange
+                }
         }
-        rownames(A.matrix) <- paste0('P',c(1:npeaks))
-        return(A.matrix)
+        matrix[indexb, ] <- matrixb
+        # add row names
+        rownames(matrix) <- paste0('P', c(1:npeaks))
+        return(list(
+                matrix = matrix,
+                conp = index,
+                batchp = indexb,
+                con = condition,
+                batch = batch,
+                cmatrix = matrixc,
+                bmatrix = matrixb0
+        ))
 }

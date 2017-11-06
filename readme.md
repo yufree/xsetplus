@@ -24,3 +24,11 @@ devtools::install_github('yufree/sva-devel')
 devtools::install_github('yufree/xsetplus')
 library('xsetplus')
 ```
+data(adduct_table)
+data(hmdbAllinf)
+data(hmdbCompMZ)
+data(keggCompMZ)
+data(lipidmapsCompMZ)
+data(t3dbCompMZ)
+data(adduct_weights)
+num_nodes = 10

@@ -2,6 +2,7 @@
 
 export(anno)
 export(fanno)
+export(fanno2)
 export(getQCraw)
 export(getbgremove)
 export(getbiorep)

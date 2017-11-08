@@ -106,6 +106,63 @@ fanno <-
                 }
                 return(annotres)
         }
+#' Annotation with xMSannotator package for list
+#' @param list a list to be annotated
+#' @param outloc the path for your result
+#' @param mode defalut is for positive mode, otherwise use 'neg' for negative
+#' @param db_name default is 'HMDB', other database options: 'KEGG', 'LipidMaps', 'T3DB'
+#' @param num_nodes default 10
+#' @param ... parameters for multilevelannotation function in xMSannotator
+#' @return as shown in xMSannotator package
+#' @references Uppal, K.; Walker, D. I.; Jones, D. P. Anal. Chem. 2017, 89 (2), 1063–1067.
+#' @examples
+#' \dontrun{
+#' path <- "./data/"
+#' xset <- getdata(path)
+#' list <- getmzrt(xset)
+#' result <- fanno2(list)
+#' }
+#' @export
+fanno2 <-
+        function(list,
+                 outloc = "./result/",
+                 mode = 'pos',
+                 db_name = 'HMDB', num_nodes = 10,...) {
+                data <- list$data
+                mz <- list$mz
+                time <- list$rt
+                adduct_weights = cbind.data.frame(Adduct = c('M+H','M-H'),Weight = c(5,5))
+                data <- as.data.frame(cbind(mz, time, data))
+                data <- unique(data)
+                if ( mode == 'neg') {
+                        annotres <-
+                                xMSannotator::multilevelannotation(
+                                        dataA = data,
+                                        mode = mode,
+                                        outloc = outloc,
+                                        db_name = db_name,
+                                        adduct_weights = adduct_weights,
+                                        filter.by = c("M-H"),
+                                        mass_defect_mode = mode,
+                                        num_nodes = num_nodes,
+                                        ...
+                                )
+                }else{
+                        annotres <-
+                                xMSannotator::multilevelannotation(
+                                        dataA = data,
+                                        mode = mode,
+                                        outloc = outloc,
+                                        db_name = db_name,
+                                        adduct_weights = adduct_weights,
+                                        filter.by = c("M+H"),
+                                        mass_defect_mode = mode,
+                                        num_nodes = num_nodes,
+                                        ...
+                                )
+                }
+                return(annotres)
+        }
 
 #' Output pathway annotation data for Mummichog algorithm
 #' @param xset a xcmsset object to be annotated

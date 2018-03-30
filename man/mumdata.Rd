@@ -5,7 +5,7 @@
 \title{Output pathway annotation data for Mummichog algorithm}
 \usage{
 mumdata(xset, lv = NULL, name = "test", method = "medret",
-  intensity = "inio")
+  intensity = "into")
 }
 \arguments{
 \item{xset}{a xcmsset object to be annotated}

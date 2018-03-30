@@ -180,7 +180,7 @@ mumdata <-
                  lv = NULL,
                  name = 'test',
                  method = "medret",
-                 intensity = 'inio') {
+                 intensity = 'into') {
                 data <- xcms::groupval(xset, method, intensity)
                 if (intensity == "intb") {
                         data[is.na(data)] = 0

@@ -5,7 +5,7 @@
 \title{Annotation with xMSannotator package}
 \usage{
 fanno(xset, outloc = "./result/", mode = "pos", db_name = "HMDB",
-  num_nodes = 10, ppm = 10, ...)
+  num_nodes = 10, ppm = 5, ...)
 }
 \arguments{
 \item{xset}{a xcmsset object to be annotated}
@@ -17,6 +17,8 @@ fanno(xset, outloc = "./result/", mode = "pos", db_name = "HMDB",
 \item{db_name}{default is 'HMDB', other database options: 'KEGG', 'LipidMaps', 'T3DB'}
 
 \item{num_nodes}{default 10}
+
+\item{ppm}{default 5 for mass accuracy}
 
 \item{...}{parameters for multilevelannotation function in xMSannotator}
 }

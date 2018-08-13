@@ -55,6 +55,7 @@ anno <- function(path, name, mode = NULL) {
 #' @param mode defalut is for positive mode, otherwise use 'neg' for negative
 #' @param db_name default is 'HMDB', other database options: 'KEGG', 'LipidMaps', 'T3DB'
 #' @param num_nodes default 10
+#' @param ppm default 5 for mass accuracy
 #' @param ... parameters for multilevelannotation function in xMSannotator
 #' @return as shown in xMSannotator package
 #' @references Uppal, K.; Walker, D. I.; Jones, D. P. Anal. Chem. 2017, 89 (2), 1063–1067.
@@ -70,7 +71,7 @@ fanno <-
         function(xset,
                  outloc = "./result/",
                  mode = 'pos',
-                 db_name = 'HMDB', num_nodes = 10,ppm=10,...) {
+                 db_name = 'HMDB', num_nodes = 10,ppm=5,...) {
                 data <- xcms::groupval(xset, 'medret', "into")
                 adduct_weights = cbind.data.frame(Adduct = c('M+H','M-H'),Weight = c(5,5))
                 mz <- xcms::groups(xset)[, 1]

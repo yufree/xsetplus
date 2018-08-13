@@ -70,7 +70,7 @@ fanno <-
         function(xset,
                  outloc = "./result/",
                  mode = 'pos',
-                 db_name = 'HMDB', num_nodes = 10,...) {
+                 db_name = 'HMDB', num_nodes = 10,ppm=10,...) {
                 data <- xcms::groupval(xset, 'medret', "into")
                 adduct_weights = cbind.data.frame(Adduct = c('M+H','M-H'),Weight = c(5,5))
                 mz <- xcms::groups(xset)[, 1]
@@ -81,6 +81,7 @@ fanno <-
                         annotres <-
                                 xMSannotator::multilevelannotation(
                                         dataA = data,
+                                        max.mz.diff = ppm,
                                         mode = mode,
                                         outloc = outloc,
                                         db_name = db_name,
@@ -94,6 +95,7 @@ fanno <-
                         annotres <-
                                 xMSannotator::multilevelannotation(
                                         dataA = data,
+                                        max.mz.diff = ppm,
                                         mode = mode,
                                         outloc = outloc,
                                         db_name = db_name,
@@ -194,7 +196,7 @@ mumdata <-
                 mod0 <- as.matrix(c(rep(1, ncol(data))))
                 fstats <- sva::fstats(data, mod, mod0)
                 pvalue <- sva::f.pvalue(data, mod, mod0)
-                df <- cbind.data.frame(mz, rt, pvalue, fstats)
+                df <- cbind.data.frame(m.z = mz, rt, p.value = pvalue, t.score = fstats)
                 filename <- paste0(name, '.txt')
                 utils::write.table(df,
                             file = filename,

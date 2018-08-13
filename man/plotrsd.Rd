@@ -4,7 +4,8 @@
 \alias{plotrsd}
 \title{plot the rsd influnces of data}
 \usage{
-plotrsd(xset, ms = c(0, 800), type = "g", inscf = 5, rsdcf = 30, ...)
+plotrsd(xset, ms = c(0, 800), type = "g", inscf = 5, rsdcf = 30,
+  ...)
 }
 \arguments{
 \item{xset}{xcmsset data}

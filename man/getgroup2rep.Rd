@@ -4,8 +4,8 @@
 \alias{getgroup2rep}
 \title{Get the two factor DoE report for samples with biological replicates in different groups}
 \usage{
-getgroup2rep(xset, file = NULL, method = "medret", intensity = "into",
-  rsdcf = 30, inscf = 5)
+getgroup2rep(xset, file = NULL, method = "medret",
+  intensity = "into", rsdcf = 30, inscf = 5)
 }
 \arguments{
 \item{xset}{the xcmsset object all of samples with technique replicates in time series or two factor DoE}

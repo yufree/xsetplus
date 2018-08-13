@@ -5,7 +5,7 @@
 \title{Annotation with xMSannotator package}
 \usage{
 fanno(xset, outloc = "./result/", mode = "pos", db_name = "HMDB",
-  num_nodes = 10, ...)
+  num_nodes = 10, ppm = 10, ...)
 }
 \arguments{
 \item{xset}{a xcmsset object to be annotated}

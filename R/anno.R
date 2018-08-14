@@ -130,7 +130,7 @@ fanno2 <-
         function(list,
                  outloc = "./result/",
                  mode = 'pos',
-                 db_name = 'HMDB', num_nodes = 10,...) {
+                 db_name = 'HMDB', num_nodes = 10,ppm=5,...) {
                 data <- list$data
                 mz <- list$mz
                 time <- list$rt
@@ -141,6 +141,7 @@ fanno2 <-
                         annotres <-
                                 xMSannotator::multilevelannotation(
                                         dataA = data,
+                                        max.mz.diff = ppm,
                                         mode = mode,
                                         outloc = outloc,
                                         db_name = db_name,
@@ -155,6 +156,7 @@ fanno2 <-
                                 xMSannotator::multilevelannotation(
                                         dataA = data,
                                         mode = mode,
+                                        max.mz.diff = ppm,
                                         outloc = outloc,
                                         db_name = db_name,
                                         adduct_weights = adduct_weights,

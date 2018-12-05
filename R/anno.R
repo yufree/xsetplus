@@ -186,15 +186,23 @@ mumdata <-
                  name = 'test',
                  method = "medret",
                  intensity = 'into') {
-                data <- xcms::groupval(xset, method, intensity)
-                if (intensity == "intb") {
-                        data[is.na(data)] = 0
+                if(class(xset) == 'xcmsSet'){
+                        data <- xcms::groupval(xset, method, intensity)
+                        if (intensity == "intb") {
+                                data[is.na(data)] = 0
+                        }
+                        if (is.null(lv)) {
+                                lv <- xset@phenoData[, 1]
+                        }
+                        mz <- xset@groups[, 1]
+                        rt <- xset@groups[, 4]
+                }else{
+                        data <- list$data
+                        mz <- list$mz
+                        rt <- list$rt
+                        lv <- list$group
                 }
-                if (is.null(lv)) {
-                        lv <- xset@phenoData[, 1]
-                }
-                mz <- xset@groups[, 1]
-                rt <- xset@groups[, 4]
+
                 mod <- stats::model.matrix(~ lv)
                 mod0 <- as.matrix(c(rep(1, ncol(data))))
                 fstats <- sva::fstats(data, mod, mod0)

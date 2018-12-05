@@ -22,6 +22,3 @@ list with mass defect analysis dataframe.
 \description{
 Group peaks by the mass defect interval group for different substructures
 }
-\seealso{
-\code{\link{getpaired}},\code{\link{getstd}},\code{\link{plotstd}},\code{\link{plotstdmd}},\code{\link{plotstdrt}}
-}

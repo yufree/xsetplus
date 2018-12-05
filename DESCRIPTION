@@ -13,5 +13,6 @@ Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr
 biocViews:
-Imports: grDevices, graphics, stats, utils, xcms,BiocParallel, MAIT, xMSannotator, limma, sva, isva, CAMERA, qvalue, RColorBrewer
-RoxygenNote: 6.1.0
+Depends: R (>= 2.10)
+Imports: grDevices, graphics, stats, utils, xcms,BiocParallel, MAIT, xMSannotator, limma, sva, isva, CAMERA, qvalue, RColorBrewer, animation, enviGCMS
+RoxygenNote: 6.1.1

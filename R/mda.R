@@ -4,7 +4,6 @@
 #' @param mdgn mass defect groups numbers for interval, 20 means 0.05 inteval on mass defect scale from -0.5 to 0.5
 #' @param lv group info for the data
 #' @return list with mass defect analysis dataframe.
-#' @seealso \code{\link{getpaired}},\code{\link{getstd}},\code{\link{plotstd}},\code{\link{plotstdmd}},\code{\link{plotstdrt}}
 #' @export
 getmdg <- function(list, submass = c(15.9949,14.003074,26.01568,14.01565,43.00581,30.01056,34.96885,78.91834), mdgn = 20, lv = NULL){
         if(is.null(list$stdmass)&is.null(list$paired)){
@@ -31,7 +30,7 @@ getmdg <- function(list, submass = c(15.9949,14.003074,26.01568,14.01565,43.0058
 
                 mdg <- cut(msdefect, seq(from = -.5, to = .5, by = 1/mdgn),include.lowest = T)
                 mdg2 <- mdg[!is.na(mdg)]
-                index <- mdg %in% Mode(mdg2)
+                index <- mdg %in% enviGCMS::Mode(mdg2)
 
                 name <- c(submass[i],paste0(submass[i],'gi'), 'majormdg')
                 md <- cbind.data.frame(msdefect,mdg,index)

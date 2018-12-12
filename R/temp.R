@@ -1,4 +1,4 @@
-#' @export
+# Function for SPME obitrap
 getopqedata <- function(path,
                         index = F,
                         xsmethod = "centWave",
@@ -92,8 +92,7 @@ getopqedata <- function(path,
         }
         return(xset3)
 }
-
-#' @export
+# Function for SPME qToF
 getopqtofdata <- function(path,
                           index = F,
                           xsmethod = "centWave",
@@ -188,26 +187,4 @@ getopqtofdata <- function(path,
                 xset3 <- xcms::fillPeaks(xset2, BPPARAM = BPPARAM)
         }
         return(xset3)
-}
-
-#' @export
-plotpcao <- function(data,center = T, scale = T,...){
-        pcao <- stats::prcomp(t(data), center = center,
-                              scale = scale)
-        pch = sub("C", "", colnames(data))
-        col = as.factor(sub(".+B", "B", pch))
-        pcaoVars = signif(((pcao$sdev) ^ 2) / (sum((pcao$sdev) ^ 2)),
-                          3) * 100
-        graphics::plot(
-                pcao$x[, 1],
-                pcao$x[, 2],
-                xlab = paste("PC1:",
-                             pcaoVars[1], "% of Variance Explained"),
-                ylab = paste("PC2:",
-                             pcaoVars[2], "% of Variance Explained"),
-                pch = pch,
-                col = col,
-                cex = 2,
-                ...
-        )
 }

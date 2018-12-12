@@ -386,3 +386,20 @@ getmassdiff <- function(xcmsSet, massdiff, rtwindow,
         result$smd <- ceiling(result$sm) - result$sm
         return(result)
 }
+#' Function for Good/Bad peaks balance
+#' @param xset xcmsSet object
+#' @param cutoff minium point numbers for good peaks
+#' @return Good peaks proportion and bad peaks proportion
+#' @export
+getprop <- function(xset, cutoff = 10){
+        rt <- mean(diff(c(xset@rt$corrected[[1]])))
+        peakwidthcutoff <- cutoff*rt
+        t1 <- xcms::peaks(xset)
+        index <- Reduce(c,xset@groupidx)
+        t1s <- t1[index,]
+        peakdiff <- t1s[,6]-t1s[,5]
+        peakdiff0 <- t1[,6]-t1[,5]
+        p <- sum(peakdiff>peakwidthcutoff)/nrow(t1)
+        q <- sum(peakdiff<peakwidthcutoff)/sum(peakdiff0<peakwidthcutoff)
+        return(c(p,q))
+}

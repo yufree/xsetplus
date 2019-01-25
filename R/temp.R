@@ -188,3 +188,15 @@ getopqtofdata <- function(path,
         }
         return(xset3)
 }
+@export
+pmdtarget <- function(list,Dppm = 20,Drt = 0.5,ce = NA, name = 'target'){
+        head <-  c('On', 'Prec. m/z', 'Delta m/z (ppm)','Z', 'Prec. Type', 'Ret. Time (min)', 'Delta Ret. Time (min)', 'Iso. Width', 'Collision Energy')
+        mz <- list$mz
+        rt <- round(list$rt/60,3)
+        temp = cbind('TRUE',mz,Dppm,1,'Preferred',rt,Drt,'Narrow (~1.3 m/z)',ce)
+        data <- rbind(head,temp)
+        colnames(data) <- c('AutoPreferredExcludeMSMSTable',rep('',9))
+        name2 <- paste0(name,'.csv')
+        write.csv(data,file = name2,row.names = F)
+        return(data)
+}

@@ -188,15 +188,56 @@ getopqtofdata <- function(path,
         }
         return(xset3)
 }
-@export
-pmdtarget <- function(list,Dppm = 20,Drt = 0.5,ce = NA, name = 'target'){
+
+
+#' @export
+pmdtarget <- function(list,Dppm = 20,Drt = 0.5,ce = NA, name = 'target',n=NULL){
         head <-  c('On', 'Prec. m/z', 'Delta m/z (ppm)','Z', 'Prec. Type', 'Ret. Time (min)', 'Delta Ret. Time (min)', 'Iso. Width', 'Collision Energy')
-        mz <- list$mz
-        rt <- round(list$rt/60,3)
+        mz <- list$mz[list$stdmassindex]
+        rt <- round(list$rt[list$stdmassindex]/60,3)
         temp = cbind('TRUE',mz,Dppm,1,'Preferred',rt,Drt,'Narrow (~1.3 m/z)',ce)
         data <- rbind(head,temp)
-        colnames(data) <- c('AutoPreferredExcludeMSMSTable',rep('',9))
-        name2 <- paste0(name,'.csv')
-        write.csv(data,file = name2,row.names = F)
+        colnames(data) <- c('AutoPreferredExcludeMSMSTable',rep('',8))
+
+        if(is.null(n)){
+                name2 <- paste0(name,'.csv')
+                write.csv(data,file = name2,row.names = F)
+
+        }else{
+                idx <- targetsep(list$rt[list$stdmassindex],Drt,n)
+                for(i in 1:length(table(idx))){
+                        namei <- paste0(name,i,'.csv')
+                        idx2 <- idx == i
+                        idx3 <- c(T,idx2)
+                        datai <- data[idx3,]
+                        write.csv(datai,file = namei,row.names = F)
+                }
+        }
+
         return(data)
+}
+
+#' @export
+targetsep <- function(rt,Drt,n=6){
+        D <- Drt*60
+        dis <- stats::dist(rt, method = "manhattan")
+        fit <- stats::hclust(dis)
+        inji <- rtcluster <- stats::cutree(fit, h = D)
+        maxd <- max(table(rtcluster))
+        m <- length(unique(rtcluster))
+        inj <- ceiling(maxd/n)
+        message(paste('You need',inj,'injections!'))
+        for(i in c(1:m)) {
+                z = 1:inj
+                x <- rt[rtcluster==i]
+                while(length(x) > inj & length(x)>n){
+                        t <- sample(x,n)
+                        w <- sample(z,1)
+                        inji[rt %in% t] <- w
+                        z <- z[!(z%in%w)]
+                        x <- x[!(x %in% t)]
+                }
+                inji[rtcluster==i & rt %in% x] <- sample(z,sum(rtcluster==i & rt %in% x),replace = T)
+        }
+        return(inji)
 }

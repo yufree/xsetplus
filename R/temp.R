@@ -188,8 +188,14 @@ getopqtofdata <- function(path,
         }
         return(xset3)
 }
-
-
+#' Output pmd results into csv(s) for MS/MS validation
+#' @param list list from getstd or globalstd with independant peaks index
+#' @param Dppm ppm for targeted analysis
+#' @param Drt retention time drift for targeted analysis
+#' @param ce collision energy for MS/MS analysis
+#' @param name file name
+#' @param n max ions numbers within retention time drift windows
+#' @return NULL
 #' @export
 pmdtarget <- function(list,Dppm = 20,Drt = 0.5,ce = NA, name = 'target',n=NULL){
         head <-  c('On', 'Prec. m/z', 'Delta m/z (ppm)','Z', 'Prec. Type', 'Ret. Time (min)', 'Delta Ret. Time (min)', 'Iso. Width', 'Collision Energy')
@@ -201,7 +207,7 @@ pmdtarget <- function(list,Dppm = 20,Drt = 0.5,ce = NA, name = 'target',n=NULL){
 
         if(is.null(n)){
                 name2 <- paste0(name,'.csv')
-                write.csv(data,file = name2,row.names = F)
+                utils::write.csv(data,file = name2,row.names = F)
 
         }else{
                 idx <- targetsep(list$rt[list$stdmassindex],Drt,n)
@@ -210,13 +216,18 @@ pmdtarget <- function(list,Dppm = 20,Drt = 0.5,ce = NA, name = 'target',n=NULL){
                         idx2 <- idx == i
                         idx3 <- c(T,idx2)
                         datai <- data[idx3,]
-                        write.csv(datai,file = namei,row.names = F)
+                        utils::write.csv(datai,file = namei,row.names = F)
                 }
         }
 
         return(data)
 }
 
+#' Output pmd results into csv(s) for MS/MS validation
+#' @param rt retention time vector for peaks
+#' @param Drt retention time drift for targeted analysis
+#' @param n max ions numbers within retention time drift windows
+#' @return index for each injection
 #' @export
 targetsep <- function(rt,Drt,n=6){
         D <- Drt*60
@@ -240,4 +251,63 @@ targetsep <- function(rt,Drt,n=6){
                 inji[rtcluster==i & rt %in% x] <- sample(z,sum(rtcluster==i & rt %in% x),replace = T)
         }
         return(inji)
+}
+#' Plot circle connection of metabolites from list
+#' @param list list with data as peaks list, mz, rt and group information
+#' @param class metabolites or compounds class, default NULL
+#' @param cutoff cutoff of the absolute value of correlation coefficient
+#' @return NULL
+#' @examples
+#' \dontrun{
+#' library(faahKO)
+#' cdfpath <- system.file('cdf', package = 'faahKO')
+#' list <- getmr(cdfpath, pmethod = ' ')
+#' data <- list$data
+#' lv <- as.character(list$group$class)
+#' plotcon(list, lv)
+#' }
+#' @export
+
+plotcon <- function(list,class=NULL,cutoff = 0.6){
+        cmat <- stats::cor(t(list$data))
+        compounds <- rownames(list$data)
+        if(is.null(class)){
+                edges=data.frame(from="origin", to=compounds)
+        }else{
+                d1=data.frame(from="origin", to=class)
+                d2=data.frame(from=class, to=compounds)
+                edges=rbind(d1, d2)
+        }
+        vertices <- cbind.data.frame(name = unique(c(as.character(edges$from), as.character(edges$to))))
+        vertices$group = edges$from[ match( vertices$name, edges$to ) ]
+
+        df <- data.frame(from = compounds[which(lower.tri(cmat), arr.ind = T)[, 1]],
+                         to = compounds[which(lower.tri(cmat),arr.ind = T)[, 2]],cor = c(cmat[lower.tri(cmat)]))
+
+        dft <- df[abs(df$cor)>cutoff,]
+
+        from = match( dft$from, vertices$name)
+        to = match( dft$to, vertices$name)
+
+        vertices$id=NA
+        myleaves=which(is.na( match(vertices$name, edges$from) ))
+        nleaves=length(myleaves)
+        vertices$id[ myleaves ] = seq(1:nleaves)
+        vertices$angle= 90 - 360 * vertices$id / nleaves
+
+        vertices$hjust<-ifelse( vertices$angle < -90, 1, 0)
+        vertices$angle<-ifelse(vertices$angle < -90, vertices$angle+180, vertices$angle)
+
+        mygraph <- igraph::graph_from_data_frame(edges, vertices=vertices )
+        ggraph::ggraph(mygraph, layout = 'dendrogram', circular = TRUE) +
+                ggraph::geom_conn_bundle(data = ggraph::get_con(from = from, to = to, value = abs(dft$cor)), alpha=0.07, colour="skyblue",ggplot2::aes(width=value))  +
+                ggraph::geom_node_point(ggplot2::aes(filter = leaf, x = x*1.05, y=y*1.05, colour=group, alpha=0.2)) +
+                ggraph::geom_node_text(ggplot2::aes(x = x*1.1, y=y*1.1, filter = leaf, label=name, angle = angle, hjust=hjust), size=1.2, alpha=1)+
+                ggplot2::theme_void() +
+                ggplot2::theme(
+                        legend.position="none",
+                        plot.margin=grid::unit(c(0,0,0,0),"cm")
+                )+
+                ggplot2::expand_limits(x = c(-1.2, 1.2), y = c(-1.2, 1.2))
+
 }

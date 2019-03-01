@@ -1,11 +1,10 @@
 Package: xsetplus
 Type: Package
-Title: process and annotate data with xcms in simple way
-Version: 0.1.1
+Title: process and annotate data with xcms in a simple way
+Version: 0.1.2
 Author: Miao Yu
 Maintainer: Miao Yu <yufreecas@gmail.com>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: Function might graduate to enviGCMS package or discard to democode repo.
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
@@ -14,5 +13,5 @@ Suggests: knitr,
 VignetteBuilder: knitr
 biocViews:
 Depends: R (>= 2.10)
-Imports: grDevices, graphics, stats, utils, xcms,BiocParallel, MAIT, xMSannotator, limma, sva, isva, CAMERA, qvalue, RColorBrewer, animation, enviGCMS
+Imports: grDevices, graphics, stats, utils, xcms,BiocParallel, MAIT, xMSannotator, limma, CAMERA, qvalue, RColorBrewer, animation, enviGCMS, ggplot2, ggraph, igraph, sva
 RoxygenNote: 6.1.1

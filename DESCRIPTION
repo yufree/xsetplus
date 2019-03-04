@@ -13,5 +13,6 @@ Suggests: knitr,
 VignetteBuilder: knitr
 biocViews:
 Depends: R (>= 2.10)
-Imports: grDevices, graphics, stats, utils, xcms,BiocParallel, MAIT, xMSannotator, limma, CAMERA, qvalue, RColorBrewer, animation, enviGCMS, ggplot2, ggraph, igraph, sva
+Imports: grDevices, graphics, stats, utils, xcms,BiocParallel, MAIT, limma, CAMERA, qvalue, RColorBrewer, animation, ggplot2, ggraph, igraph, sva, xfun, tidyverse, BiocManager, remotes, stringi, webchem,IPO,ChemmineR,ChemmineOB,KEGGREST,Rdisop,GO.db, globaltest, GlobalAncova, Rgraphviz, SSPA, KEGGgraph, siggenes
+Remotes: yufree/enviGCMS, omegahat/XMLSchema, cran/SSOAP, yufree/xMSannotator, cbroeckl/RAMClustR, xia-lab/MetaboAnalystR
 RoxygenNote: 6.1.1
